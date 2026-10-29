@@ -1,0 +1,1251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Hair Journey</title>
+<style>
+/* Palette taken from the HPI Hair logo teal. Confirm exact brand values with Kimberly. */
+:root{
+  --u:min(1vw,1.7778vh);
+  --bg:#f3f8f7; --ink:#1b3a39; --muted:#46605f; --card:#ffffff;
+  --line:#c9dcda; --leaf:#4b8483; --leaf-dark:#2c6360; --gold:#a85f26; --gold-soft:#f8e8d8; --mint:#e3f0ee;
+  --serif:Georgia,"Times New Roman",serif;
+}
+html{font-size:max(9px,calc(var(--u)*.8333))}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);overflow:hidden;
+  font:1.75rem/1.3 "Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
+  background-image:radial-gradient(60rem 40rem at 105% -10%,#dcebe8 0,transparent 70%),radial-gradient(50rem 36rem at -10% 110%,#f1e6d8 0,transparent 70%);
+  display:flex;flex-direction:column;padding:1rem 3.2rem .8rem;gap:.7rem}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:.25rem solid var(--gold);outline-offset:.2rem;border-radius:.6rem}
+[hidden]{display:none!important}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:1.5rem}
+.brand{display:flex;align-items:center;gap:1.6rem}
+.logo{height:4.2rem;width:auto;mix-blend-mode:multiply;display:block}
+.vr{width:.15rem;height:3.4rem;background:var(--line)}
+.brand h1{margin:0;font:400 2.5rem/1 var(--serif);letter-spacing:.01em}
+.controls{display:flex;gap:.7rem;align-items:center}
+.btn{background:var(--card);border:.15rem solid var(--line);border-radius:999px;padding:.3rem 1.2rem;font-size:1.5rem;min-height:3.4rem;white-space:nowrap}
+.btn:hover{border-color:var(--leaf)}
+.btn.on{background:var(--leaf-dark);border-color:var(--leaf-dark);color:#fff}
+
+/* progress rail */
+.rail{display:grid;grid-template-columns:repeat(5,1fr);gap:1.2rem;flex:none}
+.rs{border:0;background:none;text-align:left;padding:0;display:block;opacity:.5}
+.rs.vis{opacity:1}
+.rs:disabled{cursor:default}
+.rs .t{display:flex;align-items:baseline;gap:.7rem;font-size:1.6rem;font-weight:600;color:var(--muted);margin-bottom:.35rem}
+.rs .t b{font:700 1.4rem/1 "Segoe UI",sans-serif;background:var(--line);color:var(--ink);width:2.1rem;height:2.1rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;align-self:center;transition:.4s}
+.rs.done .t b{background:var(--leaf-dark);color:#fff}
+.rs.cur .t{color:var(--gold);font-weight:700}
+.rs.cur .t b{background:var(--gold);color:#fff}
+.bar{display:block;height:.5rem;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--leaf),var(--leaf-dark));border-radius:99px;transition:width .9s cubic-bezier(.4,0,.2,1)}
+.rs.cur .bar i{background:linear-gradient(90deg,var(--leaf),var(--gold))}
+
+/* stage area */
+main{flex:1 1 0;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:1.4rem;position:relative}
+main.enter.fwd>*{animation:inR .7s cubic-bezier(.2,.7,.2,1) both}
+main.enter.back>*{animation:inL .7s cubic-bezier(.2,.7,.2,1) both}
+main.enter>*:nth-child(2){animation-delay:.08s}main.enter>*:nth-child(3){animation-delay:.16s}main.enter>*:nth-child(4){animation-delay:.24s}
+@keyframes inR{from{opacity:0;transform:translateX(4rem)}to{opacity:1;transform:none}}
+@keyframes inL{from{opacity:0;transform:translateX(-4rem)}to{opacity:1;transform:none}}
+.eyebrow{font-size:1.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700}
+h2.q{margin:.2rem 0 0;font:400 4.6rem/1.08 var(--serif);letter-spacing:-.005em}
+.lead{margin:.5rem 0 0;font-size:1.75rem;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:1.8rem}
+.card{position:relative;text-align:left;background:var(--card);border:.2rem solid var(--line);border-radius:2rem;padding:1.6rem 1.8rem 1.5rem;display:flex;flex-direction:column;gap:.6rem;min-height:15rem;transition:transform .25s,box-shadow .25s,border-color .25s,background .25s;box-shadow:0 .4rem 1.6rem rgba(44,99,96,.08)}
+.card:hover{transform:translateY(-.25rem);border-color:var(--leaf)}
+.card .k{width:2.9rem;height:2.9rem;border-radius:50%;background:var(--mint);color:var(--leaf-dark);font-weight:700;font-size:1.6rem;display:flex;align-items:center;justify-content:center;transition:.25s}
+.card h3{margin:.2rem 0 0;font:400 2.9rem/1.1 var(--serif)}
+.card p{margin:0;font-size:1.75rem;line-height:1.3;color:var(--muted)}
+.card .tag{margin-top:auto;font-size:1.5rem;font-weight:700;color:var(--gold)}
+.card.sel{border-color:var(--gold);background:linear-gradient(180deg,#fff,var(--gold-soft));box-shadow:0 .6rem 2.4rem rgba(168,95,38,.22)}
+.card.sel .k{background:var(--gold);color:#fff}
+.card.sel p{color:var(--ink)}
+.card.sel:after{content:"";position:absolute;right:1.6rem;top:1.6rem;width:1.6rem;height:.9rem;border-left:.4rem solid var(--gold);border-bottom:.4rem solid var(--gold);transform:rotate(-45deg)}
+.shake{animation:shake .45s}
+@keyframes shake{20%{transform:translateX(-.8rem)}40%{transform:translateX(.8rem)}60%{transform:translateX(-.5rem)}80%{transform:translateX(.5rem)}}
+.cards.big .card{min-height:25rem;padding:2.2rem 2.4rem}.cards.big .card h3{font-size:3.6rem}.cards.big .card p{font-size:2rem}.cards.big .card .k{width:3.6rem;height:3.6rem;font-size:2rem}
+.cards.sm .card{min-height:0;padding:1.2rem 1.6rem}
+.cards.sm .card h3{font-size:2.6rem}
+
+/* spectrum */
+.spectrum{display:grid;grid-template-columns:11rem 1fr 11rem;gap:1.4rem;align-items:end;padding-top:.2rem}
+.sl{font-size:1.5rem;line-height:1.15;color:var(--muted);font-weight:600;padding-bottom:2.4rem}
+.sl.r{text-align:right}
+.track{position:relative;padding-top:3.4rem;padding-bottom:3.2rem}
+.strands{display:flex;align-items:flex-end;gap:.3%;height:3.8rem}
+.strands i{flex:1;border-radius:3px 3px 0 0;background:#a9cbc8;transition:background .5s}
+.strands i.base{background:#7a9b9a}
+.strands i.z1{background:var(--leaf-dark)}
+.strands i.z2{background:var(--leaf)}
+.strands i.off{background:transparent;border:2px dashed #98b9b7;border-bottom:0}
+.spm{position:absolute;top:0;transform:translateX(-50%);transition:left .8s cubic-bezier(.4,0,.2,1);text-align:center;font-size:1.5rem;font-weight:700;white-space:nowrap;line-height:1.1;color:var(--gold)}
+.spm:after{content:"";display:block;margin:.1rem auto 0;border:.6rem solid transparent;border-top:.8rem solid currentColor;border-bottom:0;width:0}
+.spm.aim{color:var(--leaf-dark)}
+.tick{position:absolute;bottom:0;transform:translateX(-50%);font-size:1.5rem;font-weight:600;color:var(--muted);white-space:nowrap;text-align:center;transition:color .3s}
+.tick:before{content:"";display:block;width:.2rem;height:.9rem;background:var(--muted);margin:0 auto .15rem}
+.tick.on{color:var(--leaf-dark);font-weight:700}
+.note{font-size:1.75rem;color:var(--ink);background:var(--mint);border-radius:1.2rem;padding:.7rem 1.4rem;margin:0}
+
+/* timeline */
+.tl{background:var(--card);border:.15rem solid var(--line);border-radius:2rem;padding:2.2rem 2.4rem 1.2rem;position:relative}
+.tlrow{display:grid;grid-template-columns:15rem 1fr;align-items:center;gap:1.4rem;margin:.8rem 0;opacity:.6;transition:opacity .4s}
+.tlrow.on{opacity:1}
+.tlrow .nm{font:400 2.3rem/1.1 var(--serif)}
+.tltrack{position:relative;height:5.8rem;background:repeating-linear-gradient(90deg,#edf4f3 0,#edf4f3 calc(25% - 2px),var(--line) calc(25% - 2px),var(--line) 25%);border-radius:1rem}
+.band{position:absolute;left:0;top:0;bottom:0;border-radius:1rem;background:#a9cbc8;color:#fff;font-size:1.75rem;font-weight:700;display:flex;align-items:center;padding-left:1.4rem;white-space:nowrap;transform-origin:left;animation:grow 1.1s cubic-bezier(.3,.7,.2,1) both}
+.tlrow:not(.on) .band{color:var(--ink)}.tlrow.on .band{background:var(--leaf-dark)}
+.tlrow.on.more .band{background:linear-gradient(90deg,var(--leaf-dark) 70%,rgba(44,99,96,.15))}
+@keyframes grow{from{transform:scaleX(0)}}
+.axis{display:grid;grid-template-columns:15rem 1fr;gap:1.4rem}
+.axis div{position:relative;height:2.6rem;font-size:1.5rem;color:var(--muted);font-weight:600}
+.axis span{position:absolute;top:.3rem;transform:translateX(-50%);white-space:nowrap}
+.axis span:first-child{transform:none}.axis span:last-child{transform:translateX(-100%)}
+.scanwrap{position:absolute;top:.9rem;bottom:3rem;left:19.4rem;right:2.4rem;pointer-events:none}
+.scan{position:absolute;top:0;bottom:0;border-left:.3rem dashed var(--gold)}
+.scan b{position:absolute;top:-2rem;left:0;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:1.5rem;padding:.1rem .9rem;border-radius:99px;white-space:nowrap}
+
+/* start screen */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.tab{background:var(--card);border:.18rem solid var(--line);border-radius:1.4rem;padding:.4rem 1.2rem;font-size:1.75rem;min-height:4.2rem;text-align:left;display:flex;gap:.8rem;align-items:center}
+.tab b{background:var(--mint);color:var(--leaf-dark);border-radius:50%;width:2.3rem;height:2.3rem;display:inline-flex;align-items:center;justify-content:center;font-size:1.4rem;flex:none}
+.tab.sel{background:var(--gold);border-color:var(--gold);color:#fff;font-weight:700}
+.tab.sel b{background:#fff;color:var(--gold)}
+.detail{background:var(--card);border:.15rem solid var(--line);border-radius:2rem;padding:1.5rem 2.4rem 1.6rem;box-shadow:0 .4rem 1.6rem rgba(44,99,96,.08)}
+.dh{display:flex;align-items:baseline;gap:1.2rem;flex-wrap:wrap}
+.dh h3{margin:0;font:400 3.2rem/1.1 var(--serif)}
+.dh span{font-size:1.75rem;color:var(--muted)}
+.dh em{font-style:normal;font-size:1.5rem;font-weight:700;color:#fff;background:var(--leaf-dark);border-radius:99px;padding:.1rem 1rem}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:.6rem}
+.cols h4{margin:0;font-size:1.4rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.cols p{margin:.2rem 0 0;font-size:2rem;line-height:1.28}
+.gt{display:flex;gap:.7rem;margin-top:.9rem;flex-wrap:wrap}
+.gtab{background:none;border:.15rem solid var(--leaf-dark);border-radius:99px;padding:.15rem 1.3rem;font-size:1.7rem;min-height:3.8rem;color:var(--leaf-dark);font-weight:600}
+.gtab[aria-pressed="true"]{background:var(--leaf-dark);color:#fff}
+.chips{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:.7rem}
+.chip{background:var(--mint);border:.15rem solid var(--leaf);border-radius:99px;padding:.3rem 1.4rem;font-size:1.8rem;min-height:4.2rem}
+.chip[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#fff;font-weight:600}
+.exp{margin:.9rem 0 0;font-size:2rem;min-height:2.6rem}
+.exp.hint{color:var(--muted)}
+
+/* bottom */
+.guide{flex:none;display:flex;gap:1.2rem;align-items:baseline;background:var(--ink);color:#fff;border-radius:1.4rem;padding:.6rem 1.4rem;font-size:1.6rem;line-height:1.3}
+.guide b{color:#f0c9a3;text-transform:uppercase;letter-spacing:.1em;font-size:1.3rem;white-space:nowrap}
+nav.bot{flex:none;display:flex;align-items:center;justify-content:space-between;gap:1.5rem}
+nav.bot .mid{flex:1;text-align:center;color:var(--muted);font-size:1.3rem}
+.nbtn{border-radius:99px;font-size:2rem;min-height:5rem;padding:.4rem 2.6rem;border:.18rem solid var(--leaf-dark);background:var(--card);color:var(--leaf-dark);font-weight:600}
+.nbtn.go{background:var(--leaf-dark);color:#fff;min-width:19rem}
+.nbtn.go.ready{background:var(--gold);border-color:var(--gold);animation:pulse 2s infinite}
+.nbtn:disabled{opacity:.35;cursor:default}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(168,95,38,.4)}60%{box-shadow:0 0 0 1rem rgba(168,95,38,0)}}
+
+/* v3: new screens */
+body.tv{cursor:none}
+body.tv .controls,body.tv nav.bot,body.tv .guide{display:none!important}
+body.tv #main,body.tv .rail,body.tv .ov{pointer-events:none}
+.scalegrid{display:grid;grid-template-columns:repeat(10,1fr);gap:1rem}
+.sc{display:flex;flex-direction:column;align-items:center;gap:.5rem;background:var(--card);border:.2rem solid var(--line);border-radius:1.8rem;padding:1.4rem .4rem 1.1rem;transition:transform .25s,border-color .25s}
+.sc:hover{transform:translateY(-.25rem);border-color:var(--leaf)}
+.sc svg{width:68%;height:12rem}
+.sc .st2{stroke:var(--leaf-dark);stroke-width:2.6;fill:none;stroke-linecap:round}
+.sc b{font:400 3.6rem/1 var(--serif)}
+.sc.sel{background:var(--gold);border-color:var(--gold);color:#fff;box-shadow:0 .6rem 2.4rem rgba(168,95,38,.28)}
+.sc.sel .st2{stroke:#fff}
+.scends{display:flex;justify-content:space-between;font-size:2rem;font-weight:600;color:var(--muted)}
+.viz{width:100%;height:7.5rem}
+.viz path{fill:none;stroke:var(--leaf-dark);stroke-width:5;stroke-linecap:round}
+.viz circle{fill:#fff;stroke:var(--leaf-dark);stroke-width:4}
+.card.sel .viz path,.card.sel .viz circle{stroke:var(--gold)}
+.card .big{font:400 4rem/1.08 var(--serif);color:var(--leaf-dark)}
+.card.sel .big{color:var(--gold)}
+.card .time{font-size:2.1rem;color:var(--muted)}
+.card .res{color:var(--ink)}
+.draft{display:inline-block;background:var(--gold-soft);border:.15rem solid var(--gold);color:var(--gold);border-radius:99px;padding:0 1.1rem;font-size:1.5rem;font-weight:700;margin-left:1rem;vertical-align:middle;font-family:"Segoe UI",system-ui,sans-serif}
+.card.static{cursor:default}
+.card.static:hover{transform:none;border-color:var(--line)}
+.card.static.sel:hover{border-color:var(--gold)}
+.card.plan .w{font-size:1.5rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.card.plan h3{font-size:2.7rem}
+.card.plan p{color:var(--ink);font-size:1.9rem}
+.card.plan p b{display:block;font-size:1.3rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.card.plan .opts{font-size:1.65rem;color:var(--leaf-dark);margin-top:auto}
+.card.plan.mile{border-color:var(--gold);background:linear-gradient(180deg,#fff,var(--gold-soft))}
+.spend{display:flex;align-items:center;gap:1.2rem;font-size:2.6rem;flex-wrap:wrap}
+.spend input,.spend select{font-size:2.8rem;border:.2rem solid var(--leaf-dark);border-radius:1rem;padding:.2rem 1rem;background:var(--card);min-height:5rem}
+.spend input{width:14rem}
+.spend .val{font:400 3.4rem/1 var(--serif);color:var(--gold)}
+.spend .yr{font-size:1.9rem;color:var(--muted)}
+.cbar{height:1.4rem;border-radius:.7rem;background:var(--leaf-dark);margin:.2rem 0 .4rem;min-width:.5rem}
+.cbar.you{background:var(--gold)}
+.lab{font-size:1.4rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:.3rem}
+/* v3.1: spend + compare as a value story, plan as a real timeline */
+.spendbig{font:400 9rem/1 var(--serif);color:var(--gold);margin:.4rem 0 0}
+.spendbig small{font:400 3.2rem/1 var(--serif);color:var(--ink)}
+.spendunder{font-size:2.2rem;color:var(--ink);margin:.4rem 0 0;max-width:80rem}
+.contrast{display:grid;grid-template-columns:1fr 1fr;gap:1.8rem}
+.contrast .card{min-height:0}
+.contrast .card h3{font-size:2.8rem}
+.contrast .card p{font-size:2rem;color:var(--ink)}
+.contrast .cover{border-color:#d9b99a;background:var(--gold-soft)}
+.contrast .cover h3{color:var(--gold)}
+.contrast .cause{border-color:var(--leaf);background:var(--mint)}
+.contrast .cause h3{color:var(--leaf-dark)}
+.card.cmp .big{font-size:3.1rem;white-space:nowrap}
+.card.cmp .big.you{color:var(--gold)}
+.card.cmp .verdict{margin-top:auto;font-size:1.7rem;line-height:1.28;color:var(--leaf-dark);font-weight:600;padding-top:.5rem}
+.vs{display:grid;grid-template-columns:1fr 5rem 1fr;align-items:stretch}
+.vsmid{align-self:center;justify-self:center;font:italic 400 2.6rem/1 var(--serif);color:var(--muted)}
+.pan{min-height:0;gap:.5rem}
+.pan .lab{font-size:2.2rem;letter-spacing:.04em;margin:0}
+.pan.cover .lab{color:var(--gold)}
+.pan.cause .lab{color:var(--leaf-dark)}
+.pan .big{font-size:4.4rem;white-space:nowrap}
+.pan .big.you{color:var(--gold)}
+.pan.cover .viz path,.pan.cover .viz circle{stroke:var(--gold)}
+.pan.cause .viz path,.pan.cause .viz circle{stroke:var(--leaf-dark)}
+.pan .viz{height:6.5rem}
+.out{list-style:none;margin:.2rem 0 0;padding:0;display:grid;gap:.3rem;font-size:2.1rem;color:var(--ink)}
+.out li{display:flex;gap:.9rem;align-items:baseline}
+.out li:before{font-weight:700;flex:none;width:2rem}
+.out .no:before{content:"\2715";color:var(--gold)}
+.out .yes:before{content:"\2713";color:var(--leaf-dark)}
+.pan.cause{border-color:var(--leaf);background:linear-gradient(180deg,#fff,var(--mint))}
+.pan.cover{background:linear-gradient(180deg,#fff,var(--gold-soft));border-color:#d9b99a}
+.pills{display:flex;gap:.8rem;align-items:center;font-size:1.7rem;color:var(--muted)}
+.pill{background:var(--card);border:.15rem solid var(--leaf-dark);border-radius:99px;padding:.2rem 1.5rem;min-height:4rem;font-size:1.8rem;font-weight:600;color:var(--leaf-dark)}
+.pill.on{background:var(--leaf-dark);color:#fff}
+.tline{position:relative;display:grid;grid-template-columns:var(--cols);gap:1.8rem;padding-top:4rem}
+.tline:before{content:"";position:absolute;left:1rem;right:0;top:1.35rem;height:.5rem;border-radius:.3rem;background:linear-gradient(90deg,var(--leaf-dark),var(--leaf))}
+.tline:after{content:"";position:absolute;right:-.2rem;top:.65rem;border:1rem solid transparent;border-left:1.6rem solid var(--leaf);border-right:0}
+.tstep{position:relative;display:flex;flex-direction:column}
+.tnode{position:absolute;top:-4rem;left:0;display:flex;align-items:center;gap:1rem;font-weight:700;font-size:2rem;color:var(--leaf-dark)}
+.tnode i{width:3.2rem;height:3.2rem;border-radius:50%;background:var(--leaf-dark);border:.5rem solid var(--bg);box-shadow:0 0 0 .2rem var(--leaf-dark);flex:none}
+.tnode span{background:var(--bg);padding:0 .8rem;border-radius:99px}
+.tstep.mile .tnode{color:var(--gold)}
+.tstep.mile .tnode i{background:var(--gold);box-shadow:0 0 0 .2rem var(--gold)}
+.tstep .card{flex:1;min-height:0}
+.tstep .card .win{font-size:1.4rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.tstep .card h3{font-size:2.6rem}
+.tstep .card p{font-size:1.85rem;color:var(--ink)}
+.tstep .card p b{display:block;font-size:1.25rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.tline{margin-top:-.8rem}
+.tstep .card p.ex{margin-top:1rem;padding-top:.8rem;border-top:.12rem solid var(--line)}
+.tstep .card p.ex b{color:var(--leaf-dark)}
+.tstep.mile .card p.ex{border-top-color:#e2c3a4}
+.tstep .opts{font-size:1.55rem;color:var(--leaf-dark);margin-top:auto}
+.tstep.mile .card{border-color:var(--gold);background:linear-gradient(180deg,#fff,var(--gold-soft))}
+.rh{display:grid;gap:.4rem;margin:.1rem 0}
+.rh .wk{display:grid;grid-template-columns:5.6rem repeat(7,2.5rem);gap:.55rem;align-items:center}
+.rh .wl{font-size:1.4rem;font-weight:700;color:var(--muted)}
+.rh .dy{width:2.5rem;height:2.5rem;border-radius:50%;border:.2rem solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center}
+.rh .dy.sh{background:var(--leaf-dark);border-color:var(--leaf-dark)}
+.rh .dy.dt{box-shadow:0 0 0 .3rem var(--gold);border-color:#fff}
+.rh .dy.dt:after{content:"";width:.9rem;height:.9rem;border-radius:50%;background:var(--gold-soft)}
+.rh .dy:not(.dt).sh:after{content:"";width:.5rem;height:.9rem;border-radius:50% 50% 50% 50%/65% 65% 35% 35%;background:#fff}
+.rhk{display:flex;flex-direction:column;gap:.3rem;font-size:1.6rem;color:var(--ink);margin-top:.3rem}
+.rhk span:before{content:"";display:inline-block;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--leaf-dark);margin-right:.8rem;vertical-align:-.15rem}
+.rhk span.g:before{background:#fff;box-shadow:0 0 0 .25rem var(--gold);width:1rem;height:1rem;margin:0 1.1rem 0 .25rem}
+.strands i.none{background:transparent;border:0}
+.tick.stop{color:var(--gold);font-weight:700}
+.tick.stop:before{background:var(--gold)}
+.small{font-size:1.5rem;color:var(--muted);margin:0;text-align:center}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:20;background:rgba(27,58,57,.6);display:flex;align-items:center;justify-content:center;padding:2rem;animation:fade .3s}
+@keyframes fade{from{opacity:0}}
+.ov-card{background:var(--bg);border-radius:2rem;padding:1.3rem 2.4rem 1.5rem;width:min(100%,116rem);max-height:100%;overflow:auto;border:.15rem solid var(--line)}
+.ovh{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.ovh h2{margin:0;font:400 3.2rem/1.1 var(--serif)}
+.ov-card h3.h{margin:.6rem 0 .4rem;font-size:1.4rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.ov-note{margin:.3rem 0 .5rem;color:var(--muted);font-size:1.75rem}
+.phases{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.ph-card{background:var(--mint);border-radius:1rem;padding:.7rem 1rem}
+.ph-card b{display:block;font-size:2rem}
+.ph-card .tg{font-size:1.4rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.ph-card .tm{font-size:1.75rem;font-weight:700;color:var(--leaf-dark);margin:.2rem 0}
+.ph-card p{margin:0;font-size:1.6rem;line-height:1.25}
+.minis{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.mini{text-align:center;font-size:1.6rem}
+.mini svg{height:8.5rem;width:100%}
+.mini b{display:block;font-size:1.9rem}
+/* road */
+.road svg{width:100%;display:block}
+.rb-out{fill:none;stroke:var(--line);stroke-width:34;stroke-linecap:round}
+.rb-in{fill:none;stroke:#fff;stroke-width:24;stroke-linecap:round}
+.rb-in.done{stroke:#b3d8d5}
+.rn .disc{fill:#fff;stroke:var(--leaf-dark);stroke-width:5}
+.rn.done .disc{fill:#dcefee}
+.rn.cur .disc{stroke:var(--gold);stroke-width:9}
+.rn{cursor:pointer}
+.badge{fill:var(--leaf-dark)}.badge-t{fill:#fff;font-size:20px;font-weight:700;text-anchor:middle;dominant-baseline:central}
+.stk{fill:none;stroke:var(--leaf-dark);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}
+.lf{fill:var(--leaf);stroke:var(--leaf-dark);stroke-width:2.5}
+.mk{transition:transform .8s cubic-bezier(.4,0,.2,1)}
+.mk rect,.mk path{fill:var(--gold)}.mk text{fill:#fff;font-size:26px;font-weight:700;text-anchor:middle;dominant-baseline:central}
+.mk.last rect{fill:#fff;stroke:var(--muted);stroke-width:3;stroke-dasharray:8 5}.mk.last path{fill:var(--muted)}.mk.last text{fill:var(--muted)}
+.rl{display:grid;grid-template-columns:repeat(6,1fr);text-align:center;margin-top:.2rem}
+.rl>div{padding:0 .5rem;display:flex;flex-direction:column;align-items:center;gap:.4rem}
+.rl button.nm{background:none;border:0;font:700 2.1rem/1.1 "Segoe UI",sans-serif;padding:0}
+.rl .nm.cur{color:var(--gold)}
+.rl span.sm{font-size:1.6rem;line-height:1.2;color:var(--muted)}
+.roadtop{width:100%;display:block;height:7rem}
+.rnode circle{fill:var(--leaf-dark);stroke:#fff;stroke-width:8}
+.rnode text{fill:#fff;font:700 38px "Segoe UI",sans-serif;text-anchor:middle;dominant-baseline:central}
+.rnode.sel circle{fill:var(--gold)}
+.mcols{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
+.mcol{border:.15rem solid var(--leaf);border-radius:1.6rem;padding:1rem 1.4rem 1.1rem;background:#fff;display:flex;flex-direction:column;gap:.7rem}
+.mcol.sel{border-color:var(--gold);border-width:.22rem;background:linear-gradient(180deg,#fff,var(--gold-soft))}
+.mh h3{margin:0;font:400 3.4rem/1.05 var(--serif);color:var(--leaf-dark)}
+.mcol.sel .mh h3{color:var(--gold)}
+.mh span{font-size:1.9rem;color:var(--muted);display:block}
+.mh p{margin:.2rem 0 0;font-size:1.9rem;color:var(--ink)}
+.mh small{display:block;margin-top:.3rem;font-size:1.5rem;color:var(--gold);font-weight:700}
+.rs2{border-top:.12rem solid var(--line);padding-top:.7rem;position:relative}
+.rs2b{display:flex;gap:1rem;align-items:center;background:none;border:0;padding:0;text-align:left;width:100%}
+.rs2b b{display:block;font-size:2.1rem}
+.rs2b i{display:block;font-style:normal;font-size:1.6rem;color:var(--muted);line-height:1.2}
+.road svg.cue,.cue{width:4.6rem;height:4.6rem;flex:none;display:block}
+.cue .disc{fill:#fff;stroke:var(--leaf-dark);stroke-width:5}
+.cue.cur .disc{stroke:var(--gold);stroke-width:9}
+.rs2.cur .rs2b b{color:var(--gold)}
+.rpills{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0 0 5.6rem}
+.stag{position:absolute;top:.5rem;right:0;font-style:normal;background:var(--gold);color:#fff;font-weight:700;font-size:1.4rem;border-radius:99px;padding:.1rem 1rem}
+.stag.last{background:var(--muted)}
+.lvh{margin:1rem 0 .4rem;font-size:1.4rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.lvbars{display:grid;grid-template-columns:repeat(6,1fr);gap:.5rem 0}
+.lvb{display:flex;align-items:center;gap:.9rem;min-height:3.6rem;padding:0 1.4rem;border-radius:99px;background:var(--mint);border:.15rem solid var(--leaf);font-size:1.8rem;white-space:nowrap;overflow:hidden}
+.lvb b{font:400 2.2rem/1 var(--serif);color:var(--leaf-dark)}
+.lvb span{color:var(--muted);font-size:1.6rem}
+.lvb.sel{background:var(--gold);border-color:var(--gold);color:#fff}
+.lvb.sel b,.lvb.sel span{color:#fff}
+.pill{background:#fff;border:.15rem solid var(--leaf-dark);border-radius:99px;font-size:1.6rem;padding:.1rem 1rem;min-height:3rem}
+.pill.sel{background:var(--gold);border-color:var(--gold);color:#fff;font-weight:700}
+.pill.dim{opacity:.45}
+.retbar{display:flex;gap:1.4rem;align-items:center;flex-wrap:wrap;margin-top:.8rem;background:var(--card);border:.15rem solid var(--line);border-radius:1.4rem;padding:.7rem 1.2rem}
+.seg{display:flex;border:.15rem solid var(--line);border-radius:99px;overflow:hidden}
+.seg button{border:0;background:none;padding:.2rem 1.4rem;font-size:1.6rem;min-height:3.4rem}
+.seg button[aria-pressed="true"]{background:var(--gold);color:#fff;font-weight:700}
+.retbar .cmp{font-size:1.75rem;flex:1}
+.lv{display:flex;gap:.6rem}
+.foot{text-align:center;color:var(--muted);font-size:1.25rem;flex:none}
+/* take-home sheet: one component, shown on the TV and printed on one letter page. All sizes in em. */
+.sheet{font-size:1.6rem;background:var(--card);border:.15rem solid var(--line);border-radius:1.4em;padding:.9em 1.2em;display:grid;grid-template-columns:.8fr 2.2fr;grid-template-areas:"hd hd" "one one" "where stair" "next stair";gap:.7em 1.2em;min-height:0}
+.sheet .sh-hd{grid-area:hd;display:none;align-items:center;justify-content:space-between;gap:1em}
+.sheet .sh-hd img{height:2.6em}
+.sheet .sh-hd h1{margin:0;font:400 1.9em/1 var(--serif)}
+.sheet .sh-hd .fl{display:flex;gap:1.4em;font-size:.85em;color:var(--muted)}
+.sheet .sh-hd .fl span{display:inline-block;min-width:9em;border-bottom:.08em solid var(--muted)}
+.sheet .one{grid-area:one;margin:0;font:400 1.75em/1.18 var(--serif)}
+.sheet .one b{color:var(--gold);font-weight:400}
+.sheet .where{grid-area:where;background:var(--mint);border-radius:1em;padding:.7em .9em;display:flex;flex-direction:column;gap:.3em;align-items:flex-start}
+.sheet .lab2{font-size:.78em;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--gold)}
+.sheet .where svg{height:5em;width:auto}
+.sheet .st2{stroke:var(--leaf-dark);stroke-width:2.6;fill:none;stroke-linecap:round}
+.sheet .where b{font:400 1.5em/1.1 var(--serif)}
+.sheet .where span{font-size:.95em;color:var(--muted)}
+.sheet .next{grid-area:next;border:.12em solid var(--gold);border-radius:1em;padding:.7em .9em;background:var(--gold-soft);display:flex;flex-direction:column;gap:.25em}
+.sheet .next h4{margin:0;font:400 1.3em/1.1 var(--serif)}
+.sheet .next p{margin:0;font-size:.95em;line-height:1.25}
+.sheet .ln{display:inline-block;min-width:8em;border-bottom:.08em solid var(--ink)}
+.sheet .stairwrap{grid-area:stair;display:flex;flex-direction:column;gap:.4em;justify-content:flex-end}
+.sheet .stair{display:flex;align-items:stretch;gap:.6em}
+.sheet .sx{flex:1;border:.12em solid var(--leaf);border-radius:.9em;padding:.6em .8em .7em;background:linear-gradient(180deg,#fff,var(--mint));display:flex;flex-direction:column;gap:.3em;position:relative}
+.sheet .sx:nth-child(1){margin-top:4em}.sheet .sx:nth-child(2){margin-top:2em}.sheet .sx:nth-child(3){margin-top:0}
+.sheet .sx.off{border:.12em dashed #c9a27c;background:#fff}
+.sheet .sx.you{border-color:var(--gold);border-width:.18em;box-shadow:0 .2em 1em rgba(168,95,38,.22)}
+.sheet .sxh b{font:400 1.35em/1.1 var(--serif);display:block}
+.sheet .sxh span{font-size:.85em;color:var(--muted)}
+.sheet .sxh em{position:absolute;top:-.8em;right:.7em;background:var(--gold);color:#fff;font-style:normal;font-weight:700;font-size:.8em;border-radius:99px;padding:.1em .8em}
+.sheet .sxt{font-size:.74em;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--leaf-dark)}
+.sheet .sx.off .sxt{color:var(--gold)}
+.sheet ul{list-style:none;margin:0;padding:0;display:grid;gap:.3em;font-size:.95em;line-height:1.2}
+.sheet li{padding-left:1.4em;position:relative}
+.sheet li:before{position:absolute;left:0;top:0;font-weight:700}
+.sheet li.yes:before{content:"\2713";color:var(--leaf-dark)}
+.sheet li.plus:before{content:"+";color:var(--gold)}
+.sheet li b{font-weight:700}
+.sheet li i{font-style:normal;color:var(--muted);font-size:.9em}
+.sheet li span{display:block;font-size:.8em;color:var(--muted);line-height:1.2}
+.sheet .sxp{margin-top:auto;font-size:.9em;color:var(--gold);font-weight:700}
+.sheet .stnote{font-size:.9em;color:var(--muted);text-align:right}
+.sheet .pr{display:none}
+@media print{
+  @page{size:letter portrait;margin:.4in}
+  html,body{height:auto!important;overflow:visible!important;background:#fff!important}
+  body{display:block!important;padding:0!important;background-image:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  header,.rail,nav.bot,.guide,#footer,.ov{display:none!important}
+  main{display:block!important;animation:none!important}
+  main>*{animation:none!important}
+  main>*:not(.sheet){display:none!important}
+  .sheet{font-size:11.6pt;width:100%;border:0;border-radius:0;padding:0;box-shadow:none;grid-template-columns:1fr;grid-template-areas:"hd" "one" "where" "stair" "next";gap:.8em}
+  .sheet .sh-hd{display:flex}
+  .sheet .pr{display:block}
+  .sheet .where{flex-direction:row;align-items:center;gap:1.2em}
+  .sheet .where svg{height:3.8em}
+  .sheet .sx{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><img class="logo" alt="HPI Hair: Restoring Roots with Confidence" src="data:image/png;base64,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"><span class="vr"></span><h1 id="title"></h1></div>
+  <div class="controls">
+    <button class="btn" id="tvBtn"></button>
+    <button class="btn" id="roadBtn"></button>
+    <button class="btn" id="learnBtn"></button>
+    <button class="btn" id="retBtn"></button>
+    <button class="btn" id="resetBtn"></button>
+  </div>
+</header>
+<nav class="rail" id="rail" aria-label="Progress"></nav>
+<main id="main" aria-live="polite"></main>
+<div class="guide" id="guide" hidden></div>
+<nav class="bot" id="bot"></nav>
+<div class="foot" id="footer"></div>
+<div class="ov" id="ov" hidden role="dialog" aria-modal="true"></div>
+
+<script>
+/* =====================================================================
+   CONTENT: every visible word lives here. Edit this block only.
+   Draft wording for Thais and Kimberly to correct. No pricing, no client data.
+   Fields marked layout (spectrum, months, stage, group ids) are positions or links, not wording.
+   ===================================================================== */
+const content = {
+  title: "Your Hair Journey",
+  spectrum: { left: "Little to no hair", right: "Full, thick hair" },
+  markers: { here: "You are here", today: "Today", last: "Last time", aim: "Aim" },
+  buttons: {
+    road: "See the full road", reset: "Start over", returnVisit: "Return visit", close: "Close",
+    back: "Back", next: "Continue", finish: "See the full road", guideOn: "Team guide", guideOff: "Hide guide",
+    setToday: "Today", setLast: "Last time", openClient: "Open client window"
+  },
+  hints: {
+    keys: "Clicker: next and back",
+    pick: "Tap an answer to continue",
+    chip: "Tap any treatment to see what it is",
+    open: "Tap to see what happens",
+    notSet: "Not set"
+  },
+  footer: "Every journey is individual. This map is a guide, not a promise of results.",
+  panelHeadings: ["What happens", "Why it comes now", "What to expect"],
+  routeLabel: "Route:",
+
+  /* The moments of a consult. "screens" lists which screens belong to each. plan2 and plan3 appear only when the chosen plan needs them. */
+  phases: [
+    { label: "Where you are", screens: ["intake", "scale", "scalp", "labs"] },
+    { label: "How far", screens: ["level"] },
+    { label: "What it could look like", screens: ["invest", "spend", "compare"] },
+    { label: "Your plan", screens: ["plan1", "plan2", "plan3"] },
+    { label: "Your roadmap", screens: ["roadmap"] }
+  ],
+
+  screens: {
+    intake: { eyebrow: "Where you are today", q: "What are you hoping to get from today's visit?",
+      lead: "",
+      guide: "Start from the intake form. Ask what they hoped to get from the visit and tap the closest match. If they are unsure, that is a fine answer." },
+    scale: { eyebrow: "Where you are today", q: "Where is your hair today?",
+      lead: "On a scale of 1 to 10. We will place you on the road together.",
+      guide: "After their story and the scalp review, ask: 'If 1 is little to no hair and 10 is full, thick hair, where would you put yourself today?' Tap the number. Keys 1 to 9 and 0 (for 10) work too." },
+    scalp: { eyebrow: "Where you are today", q: "How is the scalp today?",
+      lead: "",
+      guide: "Say: we cannot improve your hair if the scalp is not healthy, like growing a vegetable in poor soil. Itch, flaking or redness means scalp work comes first. Otherwise tap 'Scalp is ready'." },
+    labs: { eyebrow: "Where you are today", q: "Where are you with labs and past treatments?",
+      lead: "",
+      guide: "Ask whether they already have lab results and what they have tried before. Tap the one that fits best." },
+    level: { eyebrow: "How far do you want to go?", q: "How far do you want to go?",
+      lead: "There is no right answer. This just shows us how big a step to plan for.",
+      guide: "Ask: 'How aggressive do you want to be with this?' Tap their answer. No prices yet. If they hold back, say: start at Stabilize and move up later; it is the first part of the other two. Mention that hair loss rarely improves on its own." },
+    invest: { eyebrow: "What it could look like", q: "What each route could look like",
+      lead: "",
+      guide: "Only show this after they have chosen. Say the time and the range for their choice, then ask 'is that doable?' Tap another card to compare. The price sheet and exact treatments come after." },
+    spend: { eyebrow: "What it could look like", q: "What do you spend today to cover it up?",
+      lead: "",
+      guide: "Ask what they spend now and how often (extensions, toppers, products, salon visits). Type it in. Say: those fixes cover it up, they do not change what is happening underneath. This slide and the next are optional." },
+    compare: { eyebrow: "What it could look like", q: "Cover it up, or treat the cause?",
+      lead: "",
+      guide: "Point to the gold bar: what they would spend covering it up over the same time. Then the teal bar: the plan. The point is not that a plan is cheap. It goes after the cause, and the cover-up never does." },
+    plan: { eyebrow: "Your plan, 30 days at a time", guide: "Walk through what happens at each visit and what to expect. Tap Continue for the next 30-day steps. Scalp and labs come first even for the longest plan. A highlighted step is a re-scan." },
+    roadmap: { eyebrow: "Your roadmap", q: "Where you are, and where you are going",
+      lead: "",
+      guide: "Walk left to right: here is where you are, here is where you will stop, and here is where you could go. Offer to print it for them to take home." }
+  },
+
+  /* Intake form: what the client said they expect from the visit. stage/group pre-select a panel (always overridable). */
+  intake: { options: [
+    { id: "cause", label: "Find the root cause", desc: "I want to understand why this is happening.", stage: "root", group: "Testing" },
+    { id: "options", label: "Learn my treatment options", desc: "I want to know what can be done.", stage: "intervene", group: "At home" },
+    { id: "unsure", label: "I'm not sure yet", desc: "I would like some guidance on where to begin.", stage: null, group: null }
+  ] },
+
+  /* Goal levels. reach = how much of the way to full, thick hair this route aims for (layout guess).
+     time/result are shown to the client. invest = PLACEHOLDER price range. calc = months the plan covers (low, high). */
+  levels: [
+    { id: "stabilize", label: "Stabilize", desc: "Stop further loss and protect what you have.",
+      result: "Shedding slows or stops and your scalp gets healthier, so you keep what you have.",
+      time: "0 to 30 days", short: "keep what you have", reach: 0.15, roadStages: ["start", "scalp", "root"], invest: { low: 250, high: 600 }, calc: [1, 1] },
+    { id: "enhance", label: "Enhance", desc: "Stop the loss and rebuild density over time.",
+      result: "Shedding has stopped, new growth is noted, and overall hair count and density improve.",
+      time: "About 6 months", short: "stop the loss and rebuild density", reach: 0.5, roadStages: ["intervene", "growth"], invest: { low: 1000, high: 3000 }, calc: [6, 6] },
+    { id: "further", label: "Go further", desc: "The most complete route, aiming for the fullest result.",
+      result: "The fullest result: shedding stopped, new growth, and hair count and density built up over time, then kept with maintenance.",
+      time: "9 to 12 months of regular visits", short: "the fullest result, then keep it", reach: 0.9, roadStages: ["maintain"], invest: { low: 5000, high: 8000 }, calc: [9, 12] }
+  ],
+  inaction: "Hair loss rarely improves on its own. Waiting can mean more to rebuild later.",
+  pricing: { confirmed: true },
+
+  investUi: { time: "Time", range: "Typical investment", draft: "Draft figures",
+    note: "Your clinician will go through the exact treatments and the price sheet with you next." },
+
+  compare: { amount: "I spend about", per: "per", pers: [
+      { id: "month", label: "month", perYear: 12 }, { id: "sixweeks", label: "6 weeks", perYear: 8.6667 },
+      { id: "quarter", label: "quarter", perYear: 4 }, { id: "year", label: "year", perYear: 1 } ],
+    yearly: "That is about {y} a year.", empty: "Go back and type what you spend, to see it here.",
+    planLabel: "Your plan", paceLabel: "Same time covering it up", privacy: "Typed here only. Nothing is saved or sent.",
+    spend: { lead: "Extensions, toppers, products, anything that hides it.", big: "{y} a year", under: "spent on fixes that cover it up. They do not change what is happening underneath.",
+      hint: "Type an amount above to see the year.",
+      coverTitle: "Covering it up", coverText: "Looks better for a few weeks. The loss keeps going underneath, and the spending repeats.",
+      causeTitle: "Treating the cause", causeText: "We find out why it is happening and treat it, to slow the loss and start to turn it around." },
+    verdict: { less: "Less than covering it up for the same time, and it goes after the cause.",
+      same: "About what covering it up costs, and it goes after the cause.",
+      more: "A step up from covering it up, and it goes after the cause." },
+    foot: "Covering it up repeats. A plan goes after the cause.",
+    vs: { coverTitle: "Keep covering it up", causeTitle: "Treat the cause", or: "or", switch: "Compare another plan:",
+      coverOut: ["The hair loss keeps going", "Money spent, nothing solved"], causeOut: "Going after why it is happening" } },
+
+  planUi: { perPage: 3, q: "Your {l} plan", q2: "Your {l} plan, continued", visit: "At your visit", expect: "What to expect",
+    scalpFirst: "Scalp and labs always come first, so we build on a healthy base.",
+    week: "Week", shampoo: "Shampoo, {n} days a week", detox: "Detox scalp treatment, {n} in 30 days" },
+
+  roadmap: { here: "Where you are", stop: "Where you will stop", could: "Where you could go",
+    scaleLine: "{n} of 10 on the hair scale", stopLine: "{l}: {r}.", couldLine: "{l}: {r}.",
+    furthest: "This is the fullest route. Maintenance keeps it going.",
+    priceLine: "Typical investment for your plan: {p}", showPrice: "Show price range", hidePrice: "Hide price range", print: "Print roadmap" },
+
+  /* Take-home sheet (also the last slide). adds = treatments each step brings (chip ids, DRAFT for Thais). A higher step includes the ones below it. */
+  sheet: { title: "Your hair plan", forLine: "For", dateLine: "Date",
+    scaleLine: "You are at {n} of 10 on the hair scale.", plan: "You chose {l}, {t}.", goal: "The goal: {g}.",
+    here: "You are here", planTag: "Your plan", included: "Included in your plan", could: "What you could be doing",
+    couldNote: "You can move up to the next step at any time.", furthest: "This is the fullest route. Maintenance keeps it going.",
+    next: "Your next step", when: "Write your date:", questions: "Questions for your next visit:",
+    adds: { stabilize: ["routine", "detox", "labs", "rescan"], enhance: ["kit", "supp", "prp", "gf"], further: ["exo", "meso", "iv", "coach"] } },
+
+  /* 30-day plans. DRAFT for Thais to correct. options are chip ids (names are shown, no prices). */
+  plans: {
+    stabilize: [
+      { window: "Days 0 to 30", day: "Day 0", title: "Start and protect",
+        visit: "Scalp review and scan, labs ordered, home routine set up.",
+        expect: "Shedding starts to slow and the scalp begins to calm.",
+        rhythm: { shampoo: 5, detox: 4 }, options: [] },
+      { window: "Day 30", day: "Day 30", title: "Review your labs",
+        visit: "We go over your lab results together and fine-tune your routine.",
+        expect: "Your plan is shaped by what we found.",
+        options: ["labs"] },
+      { window: "Day 60", day: "Day 60", title: "Follow-up and re-scan",
+        visit: "Shampoo refills, a re-scan, and our recommendations for continuing.",
+        expect: "You see how things are holding, then choose to keep going or move up.",
+        options: ["rescan", "routine"], milestone: true }
+    ],
+    enhance: [
+      { window: "Days 0 to 30", day: "Day 0", title: "Scalp and labs first",
+        visit: "Scalp review and scan, treatments begin, labs ordered.",
+        expect: "The scalp starts to calm and shedding begins to slow.",
+        rhythm: { shampoo: 5, detox: 4 }, options: [] },
+      { window: "Days 31 to 60", day: "Day 30", title: "Review and start",
+        visit: "Go over your lab results together and start in-clinic treatment.",
+        expect: "Your plan is fine-tuned to what we found.",
+        options: ["prp", "gf", "kit", "supp"] },
+      { window: "Days 61 to 90", title: "Build",
+        visit: "In-clinic treatment continues alongside your home routine.",
+        expect: "Early changes may start to show. They are not measured yet.",
+        options: ["prp", "gf", "laser", "kit"] },
+      { window: "Days 91 to 120", title: "Re-scan checkpoint",
+        visit: "A repeat scan and photos, compared with day one.",
+        expect: "We measure hairs per follicle, follicle density and your score.",
+        options: ["rescan", "photos"], milestone: true },
+      { window: "Days 121 to 150", title: "Adjust and continue",
+        visit: "Fine-tune the plan from the re-scan and keep treating.",
+        expect: "Your plan matches what the scan shows.",
+        options: ["prp", "exo", "meso", "laser"] },
+      { window: "Days 151 to 180", title: "Review and keep",
+        visit: "A review of the six months and a maintenance plan.",
+        expect: "Shedding has stopped, new growth is noted, and hair count and density improve, where the scan shows it.",
+        options: ["photos", "rescan", "quarterly"] }
+    ],
+    further: [
+      { window: "Days 0 to 30", day: "Day 0", title: "Scalp and labs first",
+        visit: "Scalp review and scan, treatments begin, labs ordered.",
+        expect: "The scalp starts to calm and shedding begins to slow.",
+        rhythm: { shampoo: 5, detox: 4 }, options: [] },
+      { window: "Days 31 to 60", day: "Day 30", title: "Review and start",
+        visit: "Go over your lab results together and start in-clinic treatment.",
+        expect: "Your plan is fine-tuned to what we found.",
+        options: ["prp", "exo", "kit", "supp"] },
+      { window: "Days 61 to 90", title: "Build",
+        visit: "In-clinic treatment continues alongside your home routine.",
+        expect: "Early changes may start to show. They are not measured yet.",
+        options: ["prp", "exo", "laser", "kit"] },
+      { window: "Days 91 to 120", title: "Re-scan checkpoint",
+        visit: "A repeat scan and photos, compared with day one.",
+        expect: "We measure hairs per follicle, follicle density and your score.",
+        options: ["rescan", "photos"], milestone: true },
+      { window: "Days 121 to 150", title: "Adjust and continue",
+        visit: "Fine-tune the plan from the re-scan and add treatments as needed.",
+        expect: "Your plan matches what the scan shows.",
+        options: ["exo", "meso", "iv", "laser"] },
+      { window: "Days 151 to 180", title: "Six-month check",
+        visit: "Another re-scan and photo comparison.",
+        expect: "We see how far the plan has come and what to add next.",
+        options: ["rescan", "photos", "coach"], milestone: true },
+      { window: "Days 181 to 240", title: "Keep building",
+        visit: "In-clinic treatment continues with your home routine.",
+        expect: "Progress builds on itself as hair cycles turn over.",
+        options: ["prp", "exo", "iv", "laser"] },
+      { window: "Days 241 to 270", title: "Nine-month review",
+        visit: "A full review with a repeat scan.",
+        expect: "Shedding has stopped, new growth is noted, and hair count and density are built up, where the scan shows it.",
+        options: ["rescan", "photos"], milestone: true },
+      { window: "Months 10 to 12", title: "Rest, then maintain",
+        visit: "A short rest of about 6 to 8 weeks, then maintenance treatments.",
+        expect: "Your results are kept and built on over time.",
+        options: ["quarterly", "ongoing", "periodic"] }
+    ]
+  },
+
+
+  stages: [
+    { id: "start", label: "Starting Point", summary: "Your goals and your story", spectrum: 0.10,
+      bullets: [
+        "We start with you: what you want, what you've tried, and what concerns you most.",
+        "Everything after this is shaped around your goals, so we begin by listening.",
+        "A relaxed conversation and a first look at your hair and scalp."] },
+    { id: "scalp", label: "Scalp Health", summary: "A calm, clean, balanced scalp", spectrum: 0.20,
+      bullets: [
+        "Scalp treatments, a shampoo routine, and care for itch, flaking or inflammation.",
+        "Hair grows from the scalp, so we get the scalp ready first.",
+        "A simple home routine and, if needed, scalp treatments in the clinic."] },
+    { id: "root", label: "Root Cause", summary: "Find out why", spectrum: 0.30,
+      bullets: [
+        "A scalp scan and report, a hair fall test, lab work, and a doctor referral when needed.",
+        "Hair is the result, not the cause. Knowing why guides what comes next.",
+        "A clear picture, in plain language, of what may be behind your hair concerns."] },
+    { id: "intervene", label: "Intervention", summary: "Treat what we found", spectrum: 0.45,
+      bullets: [
+        "Topicals, supplements, in-clinic treatments and devices, chosen for you.",
+        "Now that we know what is behind it, we can aim care at it.",
+        "A plan your clinician tailors to you, with the details decided together."] },
+    { id: "growth", label: "Growth", summary: "Measure your progress", spectrum: 0.65,
+      bullets: [
+        "A re-scan at roughly 90 to 120 days to compare with where you started.",
+        "Hair cycles are slow, so we measure on a schedule that gives real information.",
+        "Side-by-side photos and scan results: hairs per follicle, follicle density and your score."] },
+    { id: "maintain", label: "Maintain", summary: "Keep it for life", spectrum: 0.86,
+      bullets: [
+        "Ongoing care, periodic re-scans, and adjustments as life changes.",
+        "Your hair and scalp keep changing, so care is ongoing rather than one-and-done.",
+        "A lighter rhythm of visits and a plan that adapts with you."] }
+  ],
+
+  /* Forks. state = which consult screen asks it; stageId = where its pills hang on the full road. */
+  forks: [
+    { id: "scalp", after: "scalp", question: "How is the scalp today?",
+      branches: [
+        { id: "work", label: "Scalp needs work first", waypoint: "Scalp reset",
+          desc: "We calm and clean the scalp first, then move on to finding the cause." },
+        { id: "ready", label: "Scalp is ready", waypoint: "Ready to go",
+          desc: "The scalp is in good shape, so we go straight to finding the cause." }
+      ] },
+    { id: "labs", after: "root", question: "Where are you with labs and past treatments?",
+      branches: [
+        { id: "notyet", label: "Labs not done yet", waypoint: "Get your labs",
+          desc: "A short detour: get your labs, then a review visit about two weeks later." },
+        { id: "done", label: "Labs done, results in hand", waypoint: "Review results",
+          desc: "We go through your results together, then move on to treatment." },
+        { id: "tried", label: "Tried treatments that didn't work", waypoint: "Rethink",
+          desc: "We look at what was tried and why it may have stalled, then choose a different route." }
+      ] }
+  ],
+
+  learn: {
+    button: "How hair grows",
+    title: "How hair grows",
+    cycleHeading: "The hair growth cycle",
+    cycleNote: "Hair grows in cycles, so changes show up over months, not days. That is why we re-scan at about 90 to 120 days.",
+    phases: [
+      { name: "Anagen", tag: "Active growth", time: "3 to 6 years", text: "The follicle is building a new hair." },
+      { name: "Catagen", tag: "Transition", time: "1 to 2 weeks", text: "Growth slows and the follicle starts to pull back." },
+      { name: "Telogen", tag: "Resting", time: "5 to 6 weeks", text: "The hair rests while a new one prepares underneath." },
+      { name: "Return to Anagen", tag: "Starting over", time: "", text: "The base of the follicle forms a new hair and the cycle begins again." }
+    ],
+    miniHeading: "What happens to a follicle over time",
+    miniNote: "Follicles can shrink gradually. Each hair grows finer and shorter, until it is barely visible.",
+    miniSteps: [
+      { label: "Healthy follicle", text: "Thick, strong hair" },
+      { label: "Shrinking", text: "Finer, shorter hair" },
+      { label: "Miniaturized", text: "Wispy, barely visible hair" }
+    ],
+    close: "Close"
+  },
+
+  roadScreen: { title: "The full road", retTitle: "Return visit: where you came from and where you are now",
+    retHint: "Tap a stage to place the marker.", cmpLast: "Last time", cmpToday: "Today", levelHeading: "Goal level", levelsHeading: "How far each plan takes you on the road", includes: "Includes {x}" },
+
+  chipGroupMax: 4,
+  chips: [
+    { id: "detox", stage: "scalp", name: "Detox scalp treatment", text: "A deep cleanse that clears buildup from the scalp." },
+    { id: "stim", stage: "scalp", name: "Stimulating scalp treatment", text: "A treatment designed to support circulation in the scalp." },
+    { id: "massage", stage: "scalp", name: "Scalp massage", text: "Gentle massage to relax the scalp and support blood flow." },
+    { id: "routine", stage: "scalp", name: "Shampoo routine", text: "Shampoo and conditioner matched to your scalp, including how long to leave them on before rinsing." },
+
+    { id: "beacon", stage: "root", group: "Testing", name: "Scan & Beacon report", text: "A close-up scan of your scalp and hair, turned into a written report." },
+    { id: "hairfall", stage: "root", group: "Testing", name: "Hair fall test", text: "A simple check of how much hair is shedding." },
+    { id: "epi", stage: "root", group: "Testing", name: "Epigenetic follow-up", text: "A follow-up test that looks deeper at what may be influencing your hair." },
+    { id: "labs", stage: "root", group: "Follow-up", name: "Lab work & review", text: "Blood tests that check things which can affect hair, reviewed with you." },
+    { id: "referral", stage: "root", group: "Follow-up", name: "Doctor referral", text: "When something looks like it needs a physician, we point you to one." },
+
+    { id: "kit", stage: "intervene", group: "At home", name: "In-home kit", text: "Shampoo, conditioner and a 30ml topical to use at home." },
+    { id: "rx", stage: "intervene", group: "At home", name: "Prescription topicals", text: "Stronger topical options, when appropriate for you." },
+    { id: "supp", stage: "intervene", group: "At home", name: "Supplements & probiotic", text: "Nutritional support chosen around what we found." },
+    { id: "cap", stage: "intervene", group: "At home", name: "Laser cap / red light", text: "A wearable light device for home use, to buy or rent monthly." },
+    { id: "prp", stage: "intervene", group: "In clinic: microneedling", name: "PRP / PRF microneedling", text: "Microneedling paired with a concentrate made from your own blood." },
+    { id: "gf", stage: "intervene", group: "In clinic: microneedling", name: "Growth-factor microneedling", text: "Microneedling followed by a growth-factor serum on the scalp." },
+    { id: "exo", stage: "intervene", group: "In clinic: microneedling", name: "Exosome microneedling", text: "Microneedling with an exosome serum, including Wharton's Jelly and NanoEx versions." },
+    { id: "meso", stage: "intervene", group: "In clinic: other", name: "Mesotherapy", text: "Tiny injections of nutrients and active ingredients into the scalp." },
+    { id: "iv", stage: "intervene", group: "In clinic: other", name: "Restoration & Preservation IV", text: "An IV of vitamins and nutrients chosen to support hair health." },
+    { id: "laser", stage: "intervene", group: "In clinic: other", name: "Low-level laser session", text: "A professional red-light session at each visit." },
+
+    { id: "photos", stage: "growth", name: "Follow-up & photo comparison", text: "We look at your before and after photos side by side." },
+    { id: "rescan", stage: "growth", name: "Repeat Beacon scan", text: "The same scan as day one, so changes can be measured." },
+    { id: "coach", stage: "growth", name: "Coaching", text: "Guidance between visits to keep your routine on track." },
+
+    { id: "quarterly", stage: "maintain", name: "Quarterly maintenance", text: "A series of visits through the year to keep care consistent." },
+    { id: "ongoing", stage: "maintain", name: "Ongoing scalp treatments", text: "Regular scalp care to keep the foundation healthy." },
+    { id: "periodic", stage: "maintain", name: "Periodic re-scan", text: "A scheduled check-in scan to see how things are holding." }
+  ]
+};
+
+/* ===================================================================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const C = content, stages = C.stages;
+const stage = id => stages.find(s => s.id === id);
+const stageIdx = id => stages.findIndex(s => s.id === id);
+const MODE = new URLSearchParams(location.search).get('view') === 'tv' ? 'tv' : 'ctl';
+let SCREENS = [];
+const planCount = () => { const L = C.levels.find(l => l.id === S.level); return L ? Math.ceil(C.plans[L.id].length / C.planUi.perPage) : 3; };
+function recompute() { SCREENS = C.phases.flatMap(p => p.screens).filter(sc => !/^plan\d$/.test(sc) || +sc.slice(4) <= planCount()); S.i = Math.min(S.i, SCREENS.length - 1); }
+const phaseScreens = k => C.phases[k].screens.filter(sc => SCREENS.includes(sc));
+const phaseOf = sc => C.phases.findIndex(p => p.screens.includes(sc));
+const Q = ['intake', 'scale', 'scalp', 'labs', 'level'];            // screens that need an answer
+const fork = id => C.forks.find(f => f.id === id);
+
+const fresh = () => ({ i: 0, max: 0, intake: null, scalp: null, labs: null, level: null, sel: null, selTouched: false,
+  group: {}, chip: null, guide: false, ov: null, seg: 'today', lastStage: null, todayStage: null, lastLevel: null, todayLevel: null, focus: null,
+  scale: null, spend: { amount: '', per: 'month' }, price: false, ovStage: null });
+let S = fresh();
+
+const optsFor = k => k === 'intake' ? C.intake.options : k === 'level' ? C.levels : fork(k).branches;
+const chosen = k => optsFor(k).find(o => o.id === S[k]);
+
+/* The route this client takes, from the answers so far. Starting Point is covered by the intake, so it is not a step. */
+function path() {
+  const p = [];
+  if (S.scalp === 'work') p.push({ id: 'scalp', tag: fork('scalp').branches[0].waypoint });
+  const lb = chosen('labs');
+  p.push({ id: 'root', tag: lb ? lb.waypoint : null });
+  ['intervene', 'growth', 'maintain'].forEach(id => p.push({ id }));
+  return p;
+}
+const hereId = () => S.focus || S.sel || path()[0].id;
+const todayPos = () => S.scale ? (S.scale - .5) / 10 : stage(path()[0].id).spectrum;
+
+/* the three step cards on the "how we start" screen */
+function startCards() {
+  const p = path(), fi = Math.max(0, p.findIndex(x => x.id === hereId()));
+  const off = Math.max(0, Math.min(fi - 2, p.length - 3));
+  return p.slice(off, off + 3).map((x, k) => Object.assign({ n: p.indexOf(x) + 1 }, x));
+}
+
+const cues = [
+  `<path d="M-28 16 Q0 -8 28 16 Z" fill="#e6d6b3" stroke="#8a7650" stroke-width="3"/><circle cx="-8" cy="9" r="2.6" fill="#8a7650"/><circle cx="9" cy="11" r="2.6" fill="#8a7650"/>`,
+  `<path d="M0 -26 C14 -6 18 2 18 10 A18 18 0 0 1 -18 10 C-18 2 -14 -6 0 -26 Z" fill="#d3e8ef" stroke="#3b7a8c" stroke-width="3.5"/>`,
+  `<circle cx="-4" cy="-4" r="15" fill="#fff" class="stk"/><path d="M8 8 L23 23" class="stk" stroke-width="6"/>`,
+  `<path d="M0 24 V0" class="stk"/><path d="M0 6 C-18 6 -22 -8 -22 -12 C-6 -12 0 -4 0 6Z" class="lf"/><path d="M0 0 C16 0 20 -14 20 -18 C4 -18 0 -10 0 0Z" class="lf"/>`,
+  `<path d="M0 26 V-14" class="stk"/><path d="M0 14 C-20 14 -24 0 -24 -4 C-8 -4 0 4 0 14Z" class="lf"/><path d="M0 6 C18 6 22 -8 22 -12 C6 -12 0 -4 0 6Z" class="lf"/><path d="M0 -4 C-14 -4 -17 -14 -17 -18 C-5 -18 0 -12 0 -4Z" class="lf"/><path d="M0 -14 C8 -22 8 -28 0 -32 C-8 -28 -8 -22 0 -14Z" class="lf"/>`,
+  `<path d="M0 26 V6" class="stk" stroke-width="6"/><circle cx="-13" cy="-2" r="13" class="lf"/><circle cx="13" cy="-2" r="13" class="lf"/><circle cx="0" cy="-14" r="14" class="lf"/><circle cx="-6" cy="-12" r="3" fill="#f3e2bd"/><circle cx="10" cy="-6" r="3" fill="#f3e2bd"/>`
+];
+
+/* ---------- rail ---------- */
+function buildRail() {
+  $('#rail').innerHTML = C.phases.map((p, k) => `<button class="rs" data-act="phase" data-p="${k}"><span class="t"><b>${k + 1}</b>${esc(p.label)}</span><span class="bar"><i></i></span></button>`).join('');
+}
+function updateRail() {
+  const cur = phaseOf(SCREENS[S.i]), maxP = phaseOf(SCREENS[S.max]);
+  document.querySelectorAll('.rs').forEach((el, k) => {
+    const scr = phaseScreens(k), sub = scr.indexOf(SCREENS[S.i]);
+    const f = k < cur ? 1 : k > cur ? 0 : (sub + .5) / scr.length;
+    el.querySelector('i').style.width = f * 100 + '%';
+    el.classList.toggle('cur', k === cur);
+    el.classList.toggle('done', k < cur);
+    el.classList.toggle('vis', k <= maxP);
+    el.disabled = k > maxP;
+  });
+}
+
+/* ---------- screens ---------- */
+function cardsHTML(k, small) {
+  const opts = optsFor(k);
+  return `<div class="cards ${small ? 'sm' : 'big'}" style="--n:${opts.length}" id="cards">${opts.map((o, n) =>
+    `<button class="card ${S[k] === o.id ? 'sel' : ''}" data-act="pick" data-k="${k}" data-v="${o.id}"><span class="k">${n + 1}</span><h3>${esc(o.label)}</h3><p>${esc(o.desc)}</p></button>`).join('')}</div>`;
+}
+function head(k, qsize) {
+  const d = C.screens[k];
+  return `<div><div class="eyebrow">${esc(d.eyebrow)}</div><h2 class="q" ${qsize ? `style="font-size:${qsize}"` : ''}>${esc(d.q)}</h2>${d.lead ? `<p class="lead">${esc(d.lead)}</p>` : ''}</div>`;
+}
+
+const chipBy = id => C.chips.find(c => c.id === id);
+const aimOf = l => { const t = todayPos(); return t + (0.97 - t) * l.reach; };
+const money = n => '$' + Math.round(n).toLocaleString('en-US');
+const rangeTxt = (a, b) => a === b ? money(a) : `${money(a)} to ${money(b)}`;
+const perYearOf = (amt, per) => { const p = C.compare.pers.find(x => x.id === per); return (parseFloat(amt) || 0) * (p ? p.perYear : 0); };
+const overMonths = (amt, per, m) => perYearOf(amt, per) / 12 * m;
+
+const tuft = k => {
+  let s = '';
+  for (let j = 0; j < k; j++) {
+    const x = k === 1 ? 30 : 4 + j * (52 / (k - 1)), lean = Math.sin(j * 2.3 + k) * 5;
+    s += `<path class="st2" d="M${x.toFixed(1)} 74 Q${(x + lean).toFixed(1)} 42 ${(x + lean * 1.7).toFixed(1)} 6"/>`;
+  }
+  return `<svg viewBox="0 0 60 76" aria-hidden="true">${s}</svg>`;
+};
+function scaleHTML() {
+  return `<div class="scalegrid" id="cards">${Array.from({ length: 10 }, (_, i) => `<button class="sc ${S.scale === i + 1 ? 'sel' : ''}" data-act="scale" data-v="${i + 1}">${tuft(i + 1)}<b>${i + 1}</b></button>`).join('')}</div>
+    <div class="scends"><span>${esc(C.spectrum.left)}</span><span>${esc(C.spectrum.right)}</span></div>`;
+}
+
+function viz(l) {
+  const y = v => 74 - 64 * v, t0 = todayPos(), a = aimOf(l);
+  return `<svg class="viz" viewBox="0 0 220 80" aria-hidden="true"><path d="M10 ${y(t0).toFixed(1)} C90 ${y(t0).toFixed(1)} 120 ${y(a).toFixed(1)} 204 ${y(a).toFixed(1)}"/><circle cx="10" cy="${y(t0).toFixed(1)}" r="6"/><circle cx="204" cy="${y(a).toFixed(1)}" r="7"/></svg>`;
+}
+function levelCards() {
+  return `<div class="cards big" style="--n:3" id="cards">${C.levels.map((l, n) =>
+    `<button class="card ${S.level === l.id ? 'sel' : ''}" data-act="pick" data-k="level" data-v="${l.id}"><span class="k">${n + 1}</span><h3>${esc(l.label)}</h3>${viz(l)}<p class="res">${esc(l.result)}</p><span class="tag">${esc(l.time)}</span></button>`).join('')}</div>
+    <p class="small">${esc(C.inaction)}</p>`;
+}
+
+const draftTag = () => C.pricing.confirmed ? '' : `<span class="draft">${esc(C.investUi.draft)}</span>`;
+function investHTML() {
+  const d = C.screens.invest;
+  return `<div><div class="eyebrow">${esc(d.eyebrow)}</div><h2 class="q">${esc(d.q)}${draftTag()}</h2></div>
+    <div class="cards big" style="--n:3" id="cards">${C.levels.map((l, n) =>
+      `<button class="card ${S.level === l.id ? 'sel' : ''}" data-act="pick" data-k="level" data-v="${l.id}"><span class="k">${n + 1}</span><h3>${esc(l.label)}</h3>
+        <span class="time">${esc(l.time)}</span><div class="big">${esc(rangeTxt(l.invest.low, l.invest.high))}</div><span class="tag">${esc(C.investUi.range)}</span></button>`).join('')}</div>
+    <p class="small">${esc(C.investUi.note)}</p>`;
+}
+
+function flatViz() {
+  const y = 74 - 64 * todayPos();
+  return `<svg class="viz flat" viewBox="0 0 220 80" aria-hidden="true"><path d="M10 ${y.toFixed(1)} L204 ${y.toFixed(1)}"/><circle cx="10" cy="${y.toFixed(1)}" r="6"/><circle cx="204" cy="${y.toFixed(1)}" r="7"/></svg>`;
+}
+function compareOutHTML() {
+  const K = C.compare, V = K.vs, sp = S.spend, amt = parseFloat(sp.amount) || 0, l = chosen('level');
+  const lo = overMonths(sp.amount, sp.per, l.calc[0]), hi = overMonths(sp.amount, sp.per, l.calc[1]);
+  const maxV = Math.max(l.invest.high, hi, 1), w = v => Math.max(0.5, v / maxV * 100).toFixed(1) + '%';
+  const short = l.short.charAt(0).toUpperCase() + l.short.slice(1);
+  return `<div class="vs">
+    <div class="card static pan cover"><span class="lab">${esc(V.coverTitle)}</span><span class="time">${esc(l.time)}</span>
+      ${amt ? `<div class="big you">${esc(rangeTxt(lo, hi))}</div><div class="cbar you" style="width:${w(hi)}"></div>` : `<p>${esc(K.empty)}</p>`}
+      ${flatViz()}<ul class="out">${V.coverOut.map(t => `<li class="no">${esc(t)}</li>`).join('')}</ul></div>
+    <div class="vsmid">${esc(V.or)}</div>
+    <div class="card static pan cause"><span class="lab">${esc(V.causeTitle)}</span><span class="time">${esc(l.time)}</span>
+      <div class="big">${esc(rangeTxt(l.invest.low, l.invest.high))}</div><div class="cbar" style="width:${w(l.invest.high)}"></div>
+      ${viz(l)}<ul class="out"><li class="yes">${esc(short)}</li><li class="yes">${esc(V.causeOut)}</li></ul></div>
+  </div><p class="note">${esc(K.foot)}</p>`;
+}
+function spendHTML() {
+  const K = C.compare, sp = S.spend, d = C.screens.spend, per = K.pers.find(p => p.id === sp.per) || K.pers[0];
+  const inp = MODE === 'tv'
+    ? `<span class="val">${sp.amount ? esc(money(parseFloat(sp.amount) || 0)) : '$ ...'}</span> ${esc(K.per)} <span class="val">${esc(per.label)}</span>`
+    : `<span>$</span><input id="spAmt" type="number" min="0" step="any" inputmode="decimal" value="${esc(sp.amount)}" aria-label="${esc(K.amount)}"> ${esc(K.per)} <select id="spPer">${K.pers.map(p => `<option value="${p.id}"${p.id === sp.per ? ' selected' : ''}>${esc(p.label)}</option>`).join('')}</select>`;
+  return `<div><div class="eyebrow">${esc(d.eyebrow)}</div><h2 class="q">${esc(d.q)}</h2><p class="lead">${esc(K.spend.lead)}</p></div>
+    <div class="spend"><span>${esc(K.amount)}</span>${inp}</div><div id="spendOut"></div>
+    <div class="contrast"><div class="card static cover"><h3>${esc(K.spend.coverTitle)}</h3><p>${esc(K.spend.coverText)}</p></div>
+      <div class="card static cause"><h3>${esc(K.spend.causeTitle)}</h3><p>${esc(K.spend.causeText)}</p></div></div>
+    <p class="small">${esc(K.privacy)}</p>`;
+}
+function compareHTML() {
+  const d = C.screens.compare;
+  return `<div><div class="eyebrow">${esc(d.eyebrow)}</div><h2 class="q">${esc(d.q)}${draftTag()}</h2></div><div id="calcOut"></div>
+    <div class="pills"><span>${esc(C.compare.vs.switch)}</span>${C.levels.map(l => `<button class="pill ${S.level === l.id ? 'on' : ''}" data-act="pick" data-k="level" data-v="${l.id}">${esc(l.label)}</button>`).join('')}</div>`;
+}
+function refreshCalc() {
+  const K = C.compare, y = perYearOf(S.spend.amount, S.spend.per), so = $('#spendOut'), o = $('#calcOut');
+  if (so) so.innerHTML = y
+    ? `<div class="spendbig">${esc(K.spend.big.replace('{y}', money(y)))}</div><p class="spendunder">${esc(K.spend.under)}</p>`
+    : `<p class="spendunder">${esc(K.spend.hint)}</p>`;
+  if (o) o.innerHTML = compareOutHTML();
+}
+
+function rhythmHTML(r) {
+  const U = C.planUi, shamDays = Array.from({ length: 7 }, (_, d) => d < r.shampoo);
+  const rows = Array.from({ length: 4 }, (_, w) => `<div class="wk"><span class="wl">${esc(U.week)} ${w + 1}</span>${shamDays.map((sh, d) =>
+    `<i class="dy ${sh ? 'sh' : ''} ${w < r.detox && d === 2 ? 'dt' : ''}"></i>`).join('')}</div>`).join('');
+  return `<div class="rh">${rows}</div><div class="rhk"><span>${esc(U.shampoo.replace('{n}', r.shampoo))}</span><span class="g">${esc(U.detox.replace('{n}', r.detox))}</span></div>`;
+}
+function planHTML(page) {
+  const L = chosen('level'), U = C.planUi, steps = C.plans[L.id], a = (page - 1) * U.perPage, vis = steps.slice(a, a + U.perPage);
+  const cols = vis.map(s => s.rhythm ? '1.8fr' : '1fr').join(' ');
+  return `<div><div class="eyebrow">${esc(C.screens.plan.eyebrow)}</div><h2 class="q">${esc((page === 1 ? U.q : U.q2).replace('{l}', L.label))}</h2>
+</div>
+    <div class="tline" style="--cols:${cols}" id="cards">${vis.map(s => `<div class="tstep ${s.milestone ? 'mile' : ''}"><div class="tnode"><i></i><span>${esc(s.day || s.window)}</span></div>
+      <div class="card static plan">${s.day && s.day !== s.window ? `<span class="win">${esc(s.window)}</span>` : ''}<h3>${esc(s.title)}</h3>
+      <p><b>${esc(U.visit)}</b>${esc(s.visit)}</p>${s.rhythm ? rhythmHTML(s.rhythm) : ''}<p class="ex"><b>${esc(U.expect)}</b>${esc(s.expect)}</p>
+      ${s.options.length ? `<span class="opts">${esc(s.options.map(o => chipBy(o).name).join(', '))}</span>` : ''}</div></div>`).join('')}</div>`;
+}
+
+function spectrumHTML() {
+  const n = 56, p0 = todayPos(), L = chosen('level'), aim = aimOf(L), far = aimOf(C.levels[C.levels.length - 1]), last = L.id === C.levels[C.levels.length - 1].id;
+  const strands = Array.from({ length: n }, (_, i) => {
+    const q = (i + .5) / n, c = q <= p0 ? 'base' : q <= aim ? 'z2' : q <= far ? 'off' : 'none';
+    return `<i class="${c}" style="height:${20 + 80 * q}%"></i>`;
+  }).join('');
+  const R = C.roadmap;
+  return `<div class="spectrum"><div class="sl">${esc(C.spectrum.left)}</div>
+    <div class="track"><div class="strands">${strands}</div>
+      <div class="spm" style="left:${p0 * 100}%">${esc(C.markers.here)}${S.scale ? ': ' + esc(R.scaleLine.replace('{n}', S.scale)) : ''}</div>
+      <div class="tick stop" style="left:${aim * 100}%">${esc(R.stop)}</div>
+      ${last ? '' : `<div class="tick" style="left:${far * 100}%">${esc(R.could)}</div>`}
+    </div><div class="sl r">${esc(C.spectrum.right)}</div></div>`;
+}
+function sheetSteps() {
+  const K = C.sheet, li = C.levels.indexOf(chosen('level')), r = C.plans.stabilize[0].rhythm || {};
+  const note = { routine: r.shampoo ? `${r.shampoo} days a week` : '', detox: r.detox ? `${r.detox} times in the first 30 days` : '' };
+  return C.levels.map((l, n) => ({ l, on: n <= li, you: n === li,
+    items: K.adds[l.id].map(id => ({ name: chipBy(id).name, text: chipBy(id).text, note: note[id] || '' })) }));
+}
+function sheetHTML() {
+  const K = C.sheet, L = chosen('level'), steps = sheetSteps(), last = L.id === C.levels[C.levels.length - 1].id;
+  const nx = C.plans[L.id][1], sc = chosen('scalp'), logo = (document.querySelector('.logo') || {}).src || '';
+  const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+  const one = `${S.scale ? esc(K.scaleLine.replace('{n}', S.scale)) + ' ' : ''}${esc(K.plan.replace('{l}', L.label).replace('{t}', L.time.toLowerCase()))} <b>${esc(K.goal.replace('{g}', L.short))}</b>`;
+  return `<section class="sheet">
+    <div class="sh-hd">${logo ? `<img src="${logo}" alt="">` : ''}<h1>${esc(K.title)}</h1><div class="fl"><div>${esc(K.forLine)} <span></span></div><div>${esc(K.dateLine)} <span></span></div></div></div>
+    <p class="one">${one}</p>
+    <div class="where"><span class="lab2">${esc(K.here)}</span>${S.scale ? tuft(S.scale) : ''}<b>${S.scale ? esc(C.roadmap.scaleLine.replace('{n}', S.scale)) : ''}</b>${sc ? `<span>${esc(sc.label)}</span>` : ''}</div>
+    <div class="stairwrap"><div class="stair">${steps.map(s => `<div class="sx ${s.on ? 'on' : 'off'} ${s.you ? 'you' : ''}">
+      <div class="sxh"><b>${esc(s.l.label)}</b><span>${esc(s.l.time)}</span>${s.you ? `<em>${esc(K.planTag)}</em>` : ''}</div>
+      <div class="sxt">${esc(s.on ? K.included : K.could)}</div>
+      <ul>${s.items.map(it => s.on
+        ? `<li class="yes"><b>${esc(it.name)}</b>${it.note ? ` <i>${esc(it.note)}</i>` : ''}</li>`
+        : `<li class="plus"><b>${esc(it.name)}</b><span>${esc(it.text)}</span></li>`).join('')}</ul>
+      ${s.you && S.price ? `<div class="sxp">${esc(rangeTxt(s.l.invest.low, s.l.invest.high))}${C.pricing.confirmed ? '' : ' (draft)'}</div>` : ''}</div>`).join('')}</div>
+      <div class="stnote">${esc(last ? K.furthest : K.couldNote)}</div></div>
+    <div class="next"><span class="lab2">${esc(K.next)}</span><h4>${esc(nx.day || nx.window)}: ${esc(nx.title)}</h4><p>${esc(nx.visit)}</p>
+      <p>${esc(K.when)} <span class="ln"></span></p><p class="pr">${esc(K.questions)}<span class="ln" style="display:block;margin-top:1.4em"></span><span class="ln" style="display:block;margin-top:1.4em"></span></p></div>
+  </section>`;
+}
+function roadmapHTML() { return sheetHTML(); }
+function oldRoadmapHTML() {
+  const d = C.screens.roadmap, R = C.roadmap, L = chosen('level'), sc = chosen('scalp'), longer = C.levels.slice(C.levels.indexOf(L) + 1);
+  const price = S.price ? `<p class="small">${esc(R.priceLine.replace('{p}', rangeTxt(L.invest.low, L.invest.high)))} ${draftTag()}</p>` : '';
+  return `<div><div class="eyebrow">${esc(d.eyebrow)}</div><h2 class="q">${esc(d.q)}</h2></div>${spectrumHTML()}
+    <div class="cards sm" style="--n:3">
+      <div class="card static"><span class="lab">${esc(R.here)}</span><p class="res">${S.scale ? esc(R.scaleLine.replace('{n}', S.scale)) : ''}${sc ? (S.scale ? '. ' : '') + esc(sc.label) : ''}</p></div>
+      <div class="card static sel"><span class="lab">${esc(R.stop)}</span><p class="res"><b>${esc(L.label)}</b>, ${esc(L.time.toLowerCase())}. ${esc(L.short.charAt(0).toUpperCase() + L.short.slice(1))}.</p></div>
+      <div class="card static"><span class="lab">${esc(R.could)}</span>${longer.length ? longer.map(l => `<p class="res"><b>${esc(l.label)}</b>: ${esc(l.short)}.</p>`).join('') : `<p class="res">${esc(R.furthest)}</p>`}</div>
+    </div>${price}`;
+}
+
+function chipsFor(sid) {
+  const chips = C.chips.filter(c => c.stage === sid);
+  const groups = [...new Set(chips.map(c => c.group || ''))];
+  let g = S.group[sid];
+  if (g == null || !groups.includes(g)) {
+    const io = chosen('intake');
+    g = io && io.stage === sid && groups.includes(io.group) ? io.group : groups[0];
+  }
+  return { chips, groups, g };
+}
+function detailHTML(card) {
+  const s = stage(card.id), { chips, groups, g } = chipsFor(card.id);
+  const vis = chips.filter(c => (c.group || '') === g).slice(0, C.chipGroupMax);
+  const cur = vis.find(c => c.id === S.chip);
+  return `<div class="detail"><div class="dh"><h3>${esc(s.label)}</h3><span>${esc(s.summary)}</span>${card.tag ? `<em>${esc(C.routeLabel)} ${esc(card.tag)}</em>` : ''}</div>
+    <div class="cols">${s.bullets.map((b, k) => `<div><h4>${esc(C.panelHeadings[k])}</h4><p>${esc(b)}</p></div>`).join('')}</div>
+    ${groups.length > 1 || groups[0] ? `<div class="gt">${groups.map(x => `<button class="gtab" data-act="group" data-g="${esc(x)}" aria-pressed="${x === g}">${esc(x)}</button>`).join('')}</div>` : ''}
+    ${vis.length ? `<div class="chips">${vis.map(c => `<button class="chip" data-act="chip" data-c="${c.id}" aria-pressed="${c.id === S.chip}">${esc(c.name)}</button>`).join('')}</div>
+      <p class="exp ${cur ? '' : 'hint'}">${cur ? `<b>${esc(cur.name)}.</b> ${esc(cur.text)}` : esc(C.hints.chip)}</p>` : ''}</div>`;
+}
+function startHTML() {
+  const cards = startCards();
+  if (S.sel == null && !S.selTouched) {
+    const io = chosen('intake');
+    if (io && io.stage && cards.some(c => c.id === io.stage)) S.sel = io.stage;
+  }
+  const sel = cards.find(c => c.id === S.sel);
+  if (!sel) {
+    return head('start') + `<div class="cards" style="--n:3">${cards.map(c =>
+      `<button class="card" data-act="step" data-s="${c.id}"><span class="k">${c.n}</span><h3>${esc(stage(c.id).label)}</h3><p>${esc(stage(c.id).summary)}</p>${c.tag ? `<span class="tag">${esc(C.routeLabel)} ${esc(c.tag)}</span>` : `<span class="tag">${esc(C.hints.open)}</span>`}</button>`).join('')}</div>`;
+  }
+  return head('start', '3.4rem') + `<div class="tabs">${cards.map(c =>
+    `<button class="tab ${c.id === sel.id ? 'sel' : ''}" data-act="step" data-s="${c.id}"><b>${c.n}</b>${esc(stage(c.id).label)}</button>`).join('')}</div>` + detailHTML(sel);
+}
+
+function render(dir) {
+  const sc = SCREENS[S.i], m = $('#main'), d = C.screens[/^plan\d$/.test(sc) ? 'plan' : sc];
+  let h;
+  if (sc === 'scale') h = head(sc) + scaleHTML();
+  else if (sc === 'level') h = head(sc) + levelCards();
+  else if (Q.includes(sc)) h = head(sc) + cardsHTML(sc, false);
+  else if (sc === 'invest') h = investHTML();
+  else if (sc === 'spend') h = spendHTML();
+  else if (sc === 'compare') h = compareHTML();
+  else if (/^plan\d$/.test(sc)) h = planHTML(+sc.slice(4));
+  else h = roadmapHTML();
+  m.className = dir ? 'enter ' + dir : '';
+  m.innerHTML = h;
+  if (sc === 'spend' || sc === 'compare') refreshCalc();
+  renderBottom(); updateRail();
+  const g = $('#guide');
+  g.hidden = !S.guide || MODE === 'tv'; $('#footer').hidden = S.guide && MODE !== 'tv';
+  g.innerHTML = `<b>${esc(C.buttons.guideOn)}</b><span>${esc(d.guide)}</span>`;
+  paintOv();
+  sync();
+}
+function renderBottom() {
+  const sc = SCREENS[S.i], last = S.i === SCREENS.length - 1, R = C.roadmap;
+  $('#bot').innerHTML = `<button class="nbtn" data-act="back" ${S.i === 0 ? 'disabled' : ''}>&larr; ${esc(C.buttons.back)}</button>
+    <div class="mid"><button class="btn" data-act="guide">${esc(S.guide ? C.buttons.guideOff : C.buttons.guideOn)}</button>
+      ${sc === 'roadmap' ? ` <button class="btn" data-act="price">${esc(S.price ? R.hidePrice : R.showPrice)}</button> <button class="btn" data-act="print">${esc(R.print)}</button>` : ''}</div>
+    <button class="nbtn go ${Q.includes(sc) && S[sc] ? 'ready' : ''}" data-act="next">${esc(last ? C.buttons.finish : C.buttons.next)} &rarr;</button>`;
+}
+
+/* ---------- navigation ---------- */
+function go(i, dir) {
+  S.i = Math.max(0, Math.min(SCREENS.length - 1, i));
+  S.max = Math.max(S.max, S.i);
+  render(dir);
+}
+function next() {
+  const sc = SCREENS[S.i];
+  if (Q.includes(sc) && !S[sc]) {
+    const c = $('#cards'); if (c) { c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); }
+    return;
+  }
+  if (S.i === SCREENS.length - 1) return openOv('road');
+  go(S.i + 1, 'fwd');
+}
+function back() { if (S.i > 0) go(S.i - 1, 'back'); }
+function pick(k, v) {
+  if (k === 'scale') S.scale = S.scale === +v ? null : +v;
+  else S[k] = (S[k] === v && k === 'level' && SCREENS[S.i] === 'level') ? null : v;
+  if (k === 'intake') { S.sel = null; S.selTouched = false; S.focus = null; }
+  if (k === 'scalp' || k === 'labs') S.focus = null;
+  recompute();
+  render();
+}
+
+/* ---------- overlays ---------- */
+function follicle(k) {
+  const w = [15, 8, 3][k], len = [118, 78, 38][k], r = [19, 13, 8][k], x = 60, base = 150;
+  return `<svg viewBox="0 0 120 170" aria-hidden="true"><path d="M${x} ${base - r} V${base - r - len}" stroke="#a85f26" stroke-width="${w}" stroke-linecap="round" fill="none"/><ellipse cx="${x}" cy="${base}" rx="${r}" ry="${r * 1.15}" fill="#d98c8c" stroke="#8a4b4b" stroke-width="3"/><path d="M12 ${base - r - 6} Q${x} ${base - r - 22} 108 ${base - r - 6}" stroke="#c9a98a" stroke-width="3" fill="none"/></svg>`;
+}
+function learnHTML() {
+  const L = C.learn;
+  return `<div class="ov-card"><div class="ovh"><h2>${esc(L.title)}</h2><button class="btn" data-act="closeov">${esc(L.close)}</button></div>
+    <h3 class="h">${esc(L.cycleHeading)}</h3>
+    <div class="phases">${L.phases.map(p => `<div class="ph-card"><b>${esc(p.name)}</b><span class="tg">${esc(p.tag)}</span><div class="tm">${esc(p.time) || '&nbsp;'}</div><p>${esc(p.text)}</p></div>`).join('')}</div>
+    <p class="ov-note">${esc(L.cycleNote)}</p>
+    <h3 class="h">${esc(L.miniHeading)}</h3>
+    <div class="minis">${L.miniSteps.map((m, k) => `<div class="mini">${follicle(k)}<b>${esc(m.label)}</b>${esc(m.text)}</div>`).join('')}</div>
+    <p class="ov-note">${esc(L.miniNote)}</p></div>`;
+}
+
+const RX = i => 150 + 300 * i, RY = [150, 100, 140, 95, 135, 90];
+function seg(i) {
+  const x0 = RX(i), y0 = RY[i], x1 = RX(i + 1), y1 = RY[i + 1], d = (x1 - x0) / 2;
+  return `M${x0} ${y0} C${x0 + d} ${y0} ${x1 - d} ${y1} ${x1} ${y1}`;
+}
+function roadHTML(ret) {
+  const R = C.roadScreen;
+  const todayId = ret ? (S.todayStage || hereId()) : hereId();
+  const lastId = ret ? (S.lastStage || path()[0].id) : null;
+  const lvSel = ret ? S.todayLevel : S.level;
+  const pills = id => {
+    const f = C.forks.find(f => f.after === id);
+    if (!f) return '';
+    return `<div class="rpills">${f.branches.map(b => `<button class="pill ${S[f.id] === b.id ? 'sel' : S[f.id] ? 'dim' : ''}" data-act="rbranch" data-f="${f.id}" data-b="${b.id}">${esc(b.waypoint)}</button>`).join('')}</div>`;
+  };
+  const item = id => {
+    const s = stage(id), i = stageIdx(id);
+    return `<div class="rs2 ${id === todayId ? 'cur' : ''}"><button class="rs2b" data-act="rstage" data-s="${id}"><svg class="cue ${id === todayId ? 'cur' : ''}" viewBox="-50 -50 100 100" aria-hidden="true"><circle class="disc" r="46"/>${cues[i]}</svg>
+      <span><b>${i + 1}. ${esc(s.label)}</b><i>${esc(s.summary)}</i></span></button>
+      ${id === todayId ? `<em class="stag">${esc(ret ? C.markers.today : C.markers.here)}</em>` : ''}${ret && id === lastId && id !== todayId ? `<em class="stag last">${esc(C.markers.last)}</em>` : ''}${pills(id)}</div>`;
+  };
+  const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+  const nodeX = [300, 900, 1500];
+  const svg = `<svg class="roadtop" viewBox="0 0 1800 90" role="group" aria-label="${esc(R.title)}"><path class="rb-out" d="M40 60 C170 60 190 40 300 40 S640 62 900 40 S1250 62 1500 40 S1700 40 1760 20"/><path class="rb-in" d="M40 60 C170 60 190 40 300 40 S640 62 900 40 S1250 62 1500 40 S1700 40 1760 20"/>
+    ${C.levels.map((l, n) => `<g class="rnode ${l.id === lvSel ? 'sel' : ''}"><circle cx="${nodeX[n]}" cy="${n === 1 ? 40 : 40}" r="34"/><text x="${nodeX[n]}" y="41">${n + 1}</text></g>`).join('')}</svg>`;
+  const cols = `<div class="mcols">${C.levels.map((l, n) => `<div class="mcol ${l.id === lvSel ? 'sel' : ''}"><div class="mh"><h3>${esc(l.label)}</h3><span>${esc(l.time)}</span><p>${esc(cap(l.short))}</p>
+      ${n ? `<small>${esc(R.includes.replace('{x}', C.levels.slice(0, n).map(x => x.label).join(' and ')))}</small>` : ''}</div>${l.roadStages.map(item).join('')}</div>`).join('')}</div>`;
+  let extra = '';
+  if (ret) {
+    const lvName = id => { const l = C.levels.find(x => x.id === id); return l ? l.label : C.hints.notSet; };
+    const act = S.seg === 'last' ? 'lastLevel' : 'todayLevel';
+    extra = `<div class="retbar"><div class="seg">${['today', 'last'].map(k => `<button data-act="seg" data-k="${k}" aria-pressed="${S.seg === k}">${esc(k === 'today' ? C.buttons.setToday : C.buttons.setLast)}</button>`).join('')}</div>
+      <div class="lv">${C.levels.map(l => `<button class="pill ${S[act] === l.id ? 'sel' : ''}" data-act="rlevel" data-l="${l.id}">${esc(l.label)}</button>`).join('')}</div>
+      <div class="cmp"><b>${esc(R.levelHeading)}:</b> ${esc(R.cmpLast)} <b>${esc(lvName(S.lastLevel))}</b> &rarr; ${esc(R.cmpToday)} <b>${esc(lvName(S.todayLevel))}</b></div></div>`;
+  }
+  return `<div class="ov-card road"><div class="ovh"><h2>${esc(ret ? R.retTitle : R.title)}</h2><button class="btn" data-act="closeov">${esc(C.buttons.close)}</button></div>${svg}${cols}${extra}</div>`;
+}
+function oldRoadHTML(ret) {
+  const R = C.roadScreen;
+  const todayId = ret ? (S.todayStage || hereId()) : hereId();
+  const lastId = ret ? (S.lastStage || path()[0].id) : null;
+  const ti = stageIdx(todayId), li = lastId ? stageIdx(lastId) : -1;
+  let svg = `<svg viewBox="0 -45 1800 260" role="group" aria-label="${esc(R.title)}">`;
+  for (let i = 0; i < stages.length - 1; i++) svg += `<path class="rb-out" d="${seg(i)}"/><path class="rb-in ${i < ti ? 'done' : ''}" d="${seg(i)}"/>`;
+  stages.forEach((s, i) => {
+    svg += `<g class="rn ${i < ti ? 'done' : ''} ${i === ti ? 'cur' : ''}" data-act="rstage" data-s="${s.id}" role="button" tabindex="0" aria-label="${i + 1}. ${esc(s.label)}"><g transform="translate(${RX(i)} ${RY[i]})"><circle class="disc" r="46"/>${cues[i]}<circle class="badge" cx="-34" cy="-34" r="16"/><text class="badge-t" x="-34" y="-33">${i + 1}</text></g></g>`;
+  });
+  const mk = (k, i, lift, label) => `<g class="mk ${k}" style="transform:translate(${RX(i)}px,${RY[i] - 52 - lift}px)"><rect x="-105" y="-52" width="210" height="44" rx="22"/><path d="M-11 -9 L0 6 L11 -9 Z"/><text x="0" y="-30">${esc(label)}</text></g>`;
+  if (ret) svg += mk('last', li, li === ti ? 52 : 0, C.markers.last);
+  svg += mk('today', ti, 0, ret ? C.markers.today : C.markers.here);
+  svg += `</svg>`;
+  const pills = id => {
+    const f = C.forks.find(f => f.after === id);
+    if (!f) return '';
+    return f.branches.map(b => `<button class="pill ${S[f.id] === b.id ? 'sel' : S[f.id] ? 'dim' : ''}" data-act="rbranch" data-f="${f.id}" data-b="${b.id}">${esc(b.waypoint)}</button>`).join('');
+  };
+  const labels = `<div class="rl">${stages.map((s, i) => `<div><button class="nm ${i === ti ? 'cur' : ''}" data-act="rstage" data-s="${s.id}">${esc(s.label)}</button><span class="sm">${esc(s.summary)}</span>${pills(s.id)}</div>`).join('')}</div>`;
+  const lvSel = ret ? S.todayLevel : S.level;
+  const bars = `<h3 class="lvh">${esc(R.levelsHeading)}</h3><div class="lvbars">${C.levels.map(l =>
+    `<div class="lvb ${l.id === lvSel ? 'sel' : ''}" style="grid-column:1 / span ${stageIdx(l.roadStop) + 1}"><b>${esc(l.label)}</b><span>${esc(l.time)}</span></div>`).join('')}</div>`;
+  let extra = '';
+  if (ret) {
+    const lvName = id => { const l = C.levels.find(x => x.id === id); return l ? l.label : C.hints.notSet; };
+    const act = S.seg === 'last' ? 'lastLevel' : 'todayLevel';
+    extra = `<div class="retbar"><div class="seg">${['today', 'last'].map(k => `<button data-act="seg" data-k="${k}" aria-pressed="${S.seg === k}">${esc(k === 'today' ? C.buttons.setToday : C.buttons.setLast)}</button>`).join('')}</div>
+      <div class="lv">${C.levels.map(l => `<button class="pill ${S[act] === l.id ? 'sel' : ''}" data-act="rlevel" data-l="${l.id}">${esc(l.label)}</button>`).join('')}</div>
+      <div class="cmp"><b>${esc(R.levelHeading)}:</b> ${esc(R.cmpLast)} <b>${esc(lvName(S.lastLevel))}</b> &rarr; ${esc(R.cmpToday)} <b>${esc(lvName(S.todayLevel))}</b></div></div>`;
+  }
+  return `<div class="ov-card road"><div class="ovh"><h2>${esc(ret ? R.retTitle : R.title)}</h2><button class="btn" data-act="closeov">${esc(C.buttons.close)}</button></div>${svg}${labels}${bars}${extra}</div>`;
+}
+
+function stageOvHTML() {
+  const s = stage(S.ovStage);
+  return `<div class="ov-card"><div class="ovh"><h2>${esc(s.label)}</h2><span><button class="btn" data-act="roadback">${esc(C.roadScreen.title)}</button> <button class="btn" data-act="closeov">${esc(C.buttons.close)}</button></span></div>${detailHTML({ id: S.ovStage })}</div>`;
+}
+function paintOv(focus) {
+  const ov = $('#ov');
+  if (!S.ov) { ov.hidden = true; return; }
+  ov.innerHTML = S.ov === 'learn' ? learnHTML() : S.ov === 'stage' ? stageOvHTML() : roadHTML(S.ov === 'ret');
+  ov.hidden = false;
+  if (focus && MODE !== 'tv') { const b = ov.querySelector('button'); if (b) b.focus(); }
+}
+function openOv(kind) {
+  if (kind === 'ret') {
+    if (!S.todayStage) S.todayStage = hereId();
+    if (!S.lastStage) S.lastStage = path()[0].id;
+    if (!S.todayLevel) S.todayLevel = S.level;
+  }
+  S.ov = kind;
+  paintOv(true); sync();
+}
+function refreshOv() { const c = $('.ov-card'), sy = c ? c.scrollTop : 0; paintOv(); const c2 = $('.ov-card'); if (c2) c2.scrollTop = sy; sync(); }
+
+/* ---------- window sync: the laptop window drives, the TV window mirrors ---------- */
+const chan = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('hpi-hair-journey-b') : null;
+function sync() { if (chan && MODE === 'ctl') { const o = Object.assign({}, S); delete o.guide; chan.postMessage({ t: 'state', s: o }); } }
+if (chan) chan.onmessage = e => {
+  const m = e.data || {};
+  if (MODE === 'tv' && m.t === 'state') {
+    const prev = S.i; Object.assign(S, m.s); recompute();
+    render(m.s.i > prev ? 'fwd' : m.s.i < prev ? 'back' : undefined);
+  } else if (MODE === 'ctl' && m.t === 'hello') sync();
+};
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  if (MODE === 'tv') return;
+  const t = e.target.closest('[data-act]');
+  if (!t || t.disabled) return;
+  const d = t.dataset;
+  switch (d.act) {
+    case 'pick': return pick(d.k, d.v);
+    case 'scale': return pick('scale', d.v);
+    case 'next': return next();
+    case 'back': return back();
+    case 'guide': S.guide = !S.guide; return render();
+    case 'price': S.price = !S.price; return render();
+    case 'print': return window.print();
+    case 'phase': { const sc = phaseScreens(+d.p)[0]; return go(SCREENS.indexOf(sc), +d.p < phaseOf(SCREENS[S.i]) ? 'back' : 'fwd'); }
+    case 'group': S.group[S.ovStage || S.sel] = d.g; S.chip = null; return S.ov === 'stage' ? refreshOv() : render();
+    case 'chip': S.chip = S.chip === d.c ? null : d.c; return S.ov === 'stage' ? refreshOv() : render();
+    case 'closeov': S.ov = null; paintOv(); return sync();
+    case 'roadback': return openOv('road');
+    case 'rstage':
+      if (S.ov === 'ret') { S[S.seg === 'last' ? 'lastStage' : 'todayStage'] = d.s; return refreshOv(); }
+      S.ovStage = d.s; S.chip = null; return openOv('stage');
+    case 'rbranch': S[d.f] = S[d.f] === d.b ? null : d.b; S.focus = null; render(); return refreshOv();
+    case 'seg': S.seg = d.k; return refreshOv();
+    case 'rlevel': S[S.seg === 'last' ? 'lastLevel' : 'todayLevel'] = d.l; return refreshOv();
+  }
+});
+document.addEventListener('input', e => {
+  if (MODE === 'tv' || e.target.id !== 'spAmt') return;
+  S.spend.amount = e.target.value; refreshCalc(); sync();
+});
+document.addEventListener('change', e => {
+  if (MODE === 'tv' || e.target.id !== 'spPer') return;
+  S.spend.per = e.target.value; refreshCalc(); sync();
+});
+document.addEventListener('keydown', e => {
+  if (MODE === 'tv') return;
+  if (/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return;
+  const t = e.target.closest && e.target.closest('.rn');
+  if (t && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); return t.dispatchEvent(new MouseEvent('click', { bubbles: true })); }
+  if (S.ov) { if (e.key === 'Escape') { S.ov = null; paintOv(); sync(); } return; }
+  const sc = SCREENS[S.i], k = e.key;
+  if (k === 'ArrowRight' || k === 'PageDown') { e.preventDefault(); next(); }
+  else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); back(); }
+  else if (k === 'Escape') { if (S.chip) S.chip = null; render(); }
+  else if (sc === 'scale' && /^[0-9]$/.test(k)) pick('scale', k === '0' ? 10 : +k);
+  else if (Q.includes(sc) && sc !== 'scale' && /^[1-4]$/.test(k) && optsFor(sc)[+k - 1]) pick(sc, optsFor(sc)[+k - 1].id);
+  else if (Q.includes(sc) && sc !== 'scale' && (k === 'ArrowDown' || k === 'ArrowUp')) {
+    e.preventDefault();
+    const o = optsFor(sc), cur = o.findIndex(x => x.id === S[sc]);
+    const n = k === 'ArrowDown' ? (cur + 1) % o.length : (cur <= 0 ? o.length - 1 : cur - 1);
+    pick(sc, o[n].id);
+  }
+  else if (k === 'g' || k === 'G') { S.guide = !S.guide; render(); }
+  else if (k === 'm' || k === 'M') openOv('road');
+});
+
+function setup() {
+  document.title = C.title;
+  document.body.classList.toggle('tv', MODE === 'tv');
+  $('#title').textContent = C.title;
+  $('#footer').textContent = C.footer;
+  $('#tvBtn').textContent = C.buttons.openClient;
+  $('#roadBtn').textContent = C.buttons.road;
+  $('#learnBtn').textContent = C.learn.button;
+  $('#retBtn').textContent = C.buttons.returnVisit;
+  $('#resetBtn').textContent = C.buttons.reset;
+  $('#tvBtn').onclick = () => { window.open(location.href.split('?')[0].split('#')[0] + '?view=tv', 'hpi-client-window'); };
+  $('#roadBtn').onclick = () => openOv('road');
+  $('#learnBtn').onclick = () => openOv('learn');
+  $('#retBtn').onclick = () => openOv('ret');
+  $('#resetBtn').onclick = () => { Object.assign(S, fresh()); recompute(); S.ov = null; render('back'); };
+  recompute(); buildRail(); render();
+  if (MODE === 'tv' && chan) chan.postMessage({ t: 'hello' });
+}
+setup();
+</script>
+</body>
+</html>
